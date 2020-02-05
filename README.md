@@ -28,4 +28,5 @@ This application is able to generate charts to follow easily your power consumpt
 To automatically generate those charts, install "Charts" application. There is noting else to configure.
 
 After application is installed, please wait few hours to see enough values displayed on charts (particularly the bar chart).
+
 Charts are available from Teleinfo dashboard widget.
