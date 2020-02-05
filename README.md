@@ -1,0 +1,28 @@
+# cleepmod-teleinfo
+
+Teleinfo module for Cleep
+
+## Teleinfo
+Teleinfo is France Enedys (ex EDF) energy provider protocol for their home electric meters.
+
+It provides 2 wires that can be connected to specific equipements to read power consumption, energy subscription informations...
+
+## Installation
+To use this application you need to buy the only supported teleinfo dongle built by Charles Hallard (and available here). It costs around 20€. It's not the less expensive dongle but it the simplest one to use ;-)
+
+Then simply connect the USB dongle to your raspberrypi and install "Teleinfo" application from CleepOS.
+
+Once installed, open the application configuration page and check everything is running fine. You should see informations retrieved from your electric meter on the page.
+
+## Troubleshoot
+If problem occurs, please open logs file from "System" application.
+
+## Charts
+This application is able to generate charts to follow easily your power consumption. It can generate:
+* a line chart from your current power consumption (data updated every 1 minutes)
+* a bar chart from your daily power consumption (data updated every day after midnight)
+
+To automatically generate those charts, install "Charts" application. There is noting else to configure.
+
+After application is installed, please wait few hours to see enough values displayed on charts (particularly the bar chart).
+

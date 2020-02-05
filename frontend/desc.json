@@ -1,0 +1,12 @@
+{
+    "icon": "transmission-tower",
+    "global": {
+        "js": ["power.widget.js", "teleinfo.service.js"],
+        "html": ["power.widget.html"]
+    },
+    "config": {
+        "js": ["teleinfo.config.js"],
+        "html": ["teleinfo.config.html"]
+    }
+}
+
