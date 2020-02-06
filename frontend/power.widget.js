@@ -11,7 +11,7 @@ var widgetPowerDirective = function(raspiotService, teleinfoService) {
             'type': 'bar',
             'fields': ['timestamp', 'power'],
             'color': '#FF6600',
-            'label': 'Power (W)'
+            'label': 'Instant power (W)'
         };
         self.hasDatabase = raspiotService.isAppInstalled('database');
     }];

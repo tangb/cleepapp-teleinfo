@@ -1,11 +1,223 @@
 <div layout="column" layout-padding ng-cloak>
 
     <md-list>
-        <md-subheader class="md-no-sticky">Teleinfo informations</md-subheader>
 
+        <md-subheader class="md-no-sticky">Teleinfo device</md-subheader>
         <md-list-item>
+            <span>Dongle port</span>
+            <div class="md-secondary">
+                {{teleinfoCtl.port ? teleinfoCtl.port : 'Not found'}}
+            </div>
+        </md-list-item>
+
+        <md-divider></md-divider>
+        
+        <md-subheader class="md-no-sticky">Teleinfo informations</md-subheader>
+        <md-list-item ng-if="teleinfoCtl.teleinfo.length===0">
+            <span>No data</span>
+        </md-list-item>
+        <md-list-item ng-repeat="item in teleinfoCtl.teleinfo" class="md-2-line">
+
+            <!-- ADCO -->
+            <div ng-if="device.key==='ADCO'" class="md-list-item-text">
+                <h3>Adresse du concentrateur de téléreport</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}
+            </div>
+
+            <!-- OPTARIF -->
+            <div ng-if="device.key==='OPTARIF'" class="md-list-item-text">
+                <h3>Option tarifaire choisie</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}
+            </div>
+
+            <!-- BASE -->
+            <div ng-if="device.key==='BASE'" class="md-list-item-text">
+                <h3>Index option Base</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}Wh
+            </div>
+
+            <!-- HCHC -->
+            <div ng-if="device.key==='HCHC'" class="md-list-item-text">
+                <h3>Index option Heures creuses</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}Wh
+            </div>
+
+            <!-- HCHP -->
+            <div ng-if="device.key==='HCHP'" class="md-list-item-text">
+                <h3>Index option Heures Pleines</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}Wh
+            </div>
+
+            <!-- EJPHN -->
+            <div ng-if="device.key==='EJPHN'" class="md-list-item-text">
+                <h3>Index option EJP Heures Normales</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}Wh
+            </div>
+
+            <!-- EJPHPN -->
+            <div ng-if="device.key==='EJPHPN'" class="md-list-item-text">
+                <h3>Index option EJP Heures de Pointe Mobile</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}Wh
+            </div>
+
+            <!-- PTEC -->
+            <div ng-if="device.key==='PTEC'" class="md-list-item-text">
+                <h3>Période Tarifaire en cours</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}
+            </div>
+
+            <!-- MOTDETAT -->
+            <div ng-if="device.key==='MOTDETAT'" class="md-list-item-text">
+                <h3>Mot d'état du compteur</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}
+            </div>
+
+            <!-- ISOUSC -->
+            <div ng-if="device.key==='ISOUSC'" class="md-list-item-text">
+                <h3>Intensité souscrite</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}A
+            </div>
+
+            <!-- BBRHCJB -->
+            <div ng-if="device.key==='BBRHCJB'" class="md-list-item-text">
+                <h3>Index option Tempo Heures Creuses Jours Bleus</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}Wh
+            </div>
+
+            <!-- BBRHPJB -->
+            <div ng-if="device.key==='BBRHPJB'" class="md-list-item-text">
+                <h3>Index option Tempo Heures Pleines Jours Bleus</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}Wh
+            </div>
+
+            <!-- BBRHCJW -->
+            <div ng-if="device.key==='BBRHCJW'" class="md-list-item-text">
+                <h3>Index option Tempo Heures Creuses Jours Blancs</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}Wh
+            </div>
+
+            <!-- BBRHPJW -->
+            <div ng-if="device.key==='BBRHPJW'" class="md-list-item-text">
+                <h3>Index option Tempo Heures Pleines Jours Blancs</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}Wh
+            </div>
+
+            <!-- BBRHCJR -->
+            <div ng-if="device.key==='BBRHCJR'" class="md-list-item-text">
+                <h3>Index option Tempo Heures Creuses Jours Rouges</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}Wh
+            </div>
+
+            <!-- BBRHPJR -->
+            <div ng-if="device.key==='BBRHPJR'" class="md-list-item-text">
+                <h3>Index option Tempo Heures Pleines Jours Rouges</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}Wh
+            </div>
+
+            <!-- PEJP -->
+            <div ng-if="device.key==='PEJP'" class="md-list-item-text">
+                <h3>Préavis Début EJP (30min)</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}} minute
+            </div>
+
+            <!-- DEMAIN -->
+            <div ng-if="device.key==='DEMAIN'" class="md-list-item-text">
+                <h3>Couleur du lendemain</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}
+            </div>
+            
+            <!-- IINST -->
+            <div ng-if="device.key==='IINST'" class="md-list-item-text">
+                <h3>Intensité Instantanée</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}A
+            </div>
+
+            <!-- ADPS -->
+            <div ng-if="device.key==='ADPS'" class="md-list-item-text">
+                <h3>Avertissement de Dépassement de Puissance Souscrite</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}A
+            </div>
+
+            <!-- IMAX -->
+            <div ng-if="device.key==='IMAX'" class="md-list-item-text">
+                <h3>Intensité maximale appelée</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}A
+            </div>
+
+            <!-- HHPHC -->
+            <div ng-if="device.key==='HHPHC'" class="md-list-item-text">
+                <h3>Horaires Heures Pleines Heures Creuses</h3>
+                <p>{{device.key}}</p>
+            </div>
+            <div class="md-secondary">
+                {{device.value}}
+            </div>
 
         </md-list-item>
+
     </md-list>
 
 </div>

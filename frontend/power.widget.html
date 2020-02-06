@@ -63,6 +63,9 @@
             <md-icon md-svg-icon="circle" style="color: red;" ng-if="widgetCtl.device.nextmode=='ROUG'">
                 <md-tooltip md-direction="top">Couleur rouge</md-tooltip>
             </md-icon>
+            <md-icon md-svg-icon="alarm" ng-if="widgetCtl.device.nextmode.indexOf('EJP')>=0">
+                <md-tooltip md-direction="top">{{widgetCtl.device.nextmode}}</md-tooltip>
+            </md-icon>
         </div>
     </md-card-content> 
     <md-card-actions layout="column" layout-align="start" ng-if="widgetCtl.hasDatabase">
