@@ -7,8 +7,10 @@ var widgetTeleinfoDirective = function(raspiotService, teleinfoService) {
     var widgetTeleinfoController = ['$scope', function($scope) {
         var self = this;
         self.device = $scope.device;
-        self.graphOptions = {
-            'type': 'bar',
+        self.hasCharts = raspiotService.isAppInstalled('charts');
+        console.log('hascharts', self.hasCharts);
+        self.chartOptions = {
+            'type': 'line',
             'fields': ['timestamp', 'power'],
             'color': '#FF6600',
             'label': 'Instant power (W)'

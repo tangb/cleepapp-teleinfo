@@ -50,7 +50,7 @@
             
         <!-- current consumption -->
         <div>
-            <span class="md-display-1">{{widgetCtl.device.power ? widgetCtl.device.power : '?'}}W</span>
+            <span class="md-display-1">{{widgetCtl.device.power ? widgetCtl.device.power : '---'}}W</span>
         </div>
 
         <!-- next mode -->
@@ -72,8 +72,8 @@
             </md-icon>
         </div>
     </md-card-content> 
-    <md-card-actions layout="column" layout-align="start" ng-if="widgetCtl.hasDatabase">
-        <div layout="column" layout-align="start" graph-button device="widgetCtl.device" graph-options="widgetCtl.graphOptions" button-label="Chart" button-class="md-raised"></div>
+    <md-card-actions layout="column" layout-align="start" ng-if="widgetCtl.hasCharts">
+        <div layout="column" layout-align="start" chart-button device="widgetCtl.device" chart-options="widgetCtl.chartOptions" button-label="Chart" button-class="md-raised"></div>
     </md-card-actions>
     <md-card-footer>
         <md-icon md-svg-icon="clock">
