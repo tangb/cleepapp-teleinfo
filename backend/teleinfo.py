@@ -217,8 +217,9 @@ class Teleinfo(RaspIotModule):
 
                 #compute some values
                 if self.last_raw:
-                    #power consumption
                     keys = set(self.last_raw.keys())
+
+                    #power consumption
                     if set([u'HCHC', u'HCHP']).issubset(keys):
                         #handle heures creuses/pleines
                         self.logger.trace(u'Handle heures creuses/pleines')
@@ -242,13 +243,20 @@ class Teleinfo(RaspIotModule):
                     else:
                         self.logger.warn(u'No consumption value in raw data %s' % self.last_raw)
 
-                    #intensity
-                    if set([u'PAPP']).issubset(keys):
+                    #instant power
+                    if set([u'IINST']).issubset(keys):
+                        #handle next mode
+                        next_mode = None
+                        if set([u'DEMAIN']).issubset(keys):
+                            next_mode = self.last_raw[u'DEMAIN']
+                        elif set([u'PEJP']).issubset(keys):
+                            next_mode = u'EJP in %s mins' % self.last_raw[u'PEJP']
+
                         params = {
                             u'lastupdate': int(time.time()),
-                            u'power': int(self.last_raw[u'PAPP']) * self.VA_FACTOR,
+                            u'power': int(self.last_raw[u'IINST']) * self.VA_FACTOR,
                             u'currentmode': self.last_raw[u'PTEC'] if u'PTEC' in self.last_raw else None,
-                            u'nextmode': self.last_raw[u'DEMAIN'] if u'DEMAIN' in self.last_raw else None,
+                            u'nextmode': next_mode
                         }
                         
                         #and emit events
