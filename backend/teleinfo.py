@@ -112,7 +112,7 @@ class Teleinfo(RaspIotModule):
         #configure hardware
         if self.__configure_hardware():
             #update values at startup
-            self.last_raw = self._get_teleinfo_raw_data()
+            self._teleinfo_task()
 
         #start teleinfo task
         self._start_teleinfo_task()
