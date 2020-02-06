@@ -14,10 +14,10 @@ Then simply connect the USB dongle to your raspberrypi and install "Teleinfo" ap
 
 Once installed, open the application configuration page and check everything is running fine. You should see informations retrieved from your electric meter on the page.
 
-## Troubleshoot
+## Troubleshoot
 If problem occurs, please open logs file from "System" application.
 
-## Charts
+## Charts
 This application is able to generate charts to follow easily your power consumption. It can generate:
 * a line chart from your current power consumption (data updated every 1 minutes)
 * a bar chart from your daily power consumption (data updated every day after midnight)
