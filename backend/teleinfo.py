@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-    
+
+#fix teleinfo import. If not specified import local one that does not contain Parser and other stuff
+#this is fixed in python3.X
+from __future__ import absolute_import
 import logging
+import time
 from raspiot.utils import CommandError, MissingParameter, InvalidParameter
 from raspiot.libs.internals.task import Task
 from raspiot.raspiot import RaspIotModule
@@ -12,12 +16,6 @@ from teleinfo import Parser
 from teleinfo.hw_vendors import UTInfo2
 
 __all__ = [u'Teleinfo']
-
-class Consumption():
-    def __init__(self):
-        self.conso = None
-        self.conso_heures_pleines = None
-        self.conso_heures_creuses = None
 
 class Teleinfo(RaspIotModule):
     """
@@ -63,20 +61,20 @@ class Teleinfo(RaspIotModule):
             debug_enabled (bool): flag to set debug level to logger
         """
         #init
+        self.port = None #init here due to get_config overwritting
         RaspIotModule.__init__(self, bootstrap, debug_enabled)
 
         #members
         self.teleinfo_task = None
         self.__teleinfo_uuid = None
         self.__teleinfo_parser = None
-        self.port = None
         self.__last_conso_heures_creuses = 0
         self.__last_conso_heures_pleines = 0
 
         #events
         self.power_update_event = self._get_event('teleinfo.power.update')
         self.consumption_update_event = self._get_event('teleinfo.consumption.update')
-
+        
     def _get_config(self):
         """
         Returns module configuration
@@ -182,7 +180,7 @@ class Teleinfo(RaspIotModule):
         Params:
             event (MessageRequest): event data
         """
-        self.logger.debug(u'Event received %s' % event)
+        self.logger.trace(u'Event received %s' % event)
         if event[u'event']==u'parameters.time.now':
             #compute and send consumption event once a day at midnight
             #previous day consumption is stored in configuration file to take care of device reboot
@@ -194,6 +192,7 @@ class Teleinfo(RaspIotModule):
                 }
 
                 #send consumption event
+                self.logger.trace(u'Send consumption update event with params: %s' % params)
                 self.consumption_update_event.send(params=params, device_id=self.__teleinfo_uuid)
 
                 #save last power consumption in config file
@@ -210,35 +209,41 @@ class Teleinfo(RaspIotModule):
         """
         try:
             if self.port:
-                self.logger.debug(u'Update teleinfo')
+                self.logger.trace(u'Update teleinfo')
 
                 #read teleinfo data
                 self.last_raw = self._get_teleinfo_raw_data()
+                self.logger.debug(u'Raw teleinfo: %s' % self.last_raw)
 
                 #compute some values
                 if self.last_raw:
                     #power consumption
-                    if all(key in [u'HCHC', u'HCHP'] for key in self.last_raw.keys()):
+                    keys = set(self.last_raw.keys())
+                    if set([u'HCHC', u'HCHP']).issubset(keys):
                         #handle heures creuses/pleines
+                        self.logger.trace(u'Handle heures creuses/pleines')
                         self.__last_conso_heures_creuses = int(self.last_raw[u'HCHC'])
                         self.__last_conso_heures_pleines = int(self.last_raw[u'HCHP'])
-                    elif all(key in [u'EJPHN', u'EJPHPM'] for key in self.last_raw.keys()):
+                    elif set([u'EJPHN', u'EJPHPM']).issubset(keys):
                         #handle EJP
+                        self.logger.trace(u'Handle EJP')
                         self.__last_conso_heures_creuses = int(self.last_raw[u'EJPHN'])
                         self.__last_conso_heures_pleines = int(self.last_raw[u'EJPHPM'])
-                    elif all(key in [u'BBRHCJB', u'BBRHPJB', u'BBRHCJW', u'BBRHPJW', u'BBRHCJR', u'BBRHPJR'] for key in self.last_raw.keys()):
+                    elif set([u'BBRHCJB', u'BBRHPJB', u'BBRHCJW', u'BBRHPJW', u'BBRHCJR', u'BBRHPJR']).issubset(keys):
                         #handle Tempo
+                        self.logger.trace(u'Handle Tempo')
                         self.__last_conso_heures_creuses = int(self.last_raw[u'BBRHCJB']) + int(self.last_raw[u'BBRHCJW']) + int(self.last_raw[u'BBRHCJR'])
                         self.__last_conso_heures_pleines = int(self.last_raw[u'BBRHPJB']) + int(self.last_raw[u'BBRHPJW']) + int(self.last_raw[u'BBRHPJR'])
-                    elif all(key in [u'BASE'] for key in self.last_raw.keys()):
+                    elif set([u'BASE']).issubset(keys):
                         #handle Base
+                        self.logger.trace(u'Handle Base')
                         self.__last_conso_heures_creuses = int(self.last_raw[u'BASE'])
                         self.__last_conso_heures_pleines = 0
                     else:
                         self.logger.warn(u'No consumption value in raw data %s' % self.last_raw)
 
                     #intensity
-                    if all(key in [u'PAPP'] for key in self.last_raw.keys()):
+                    if set([u'PAPP']).issubset(keys):
                         params = {
                             u'lastupdate': int(time.time()),
                             u'power': int(self.last_raw[u'PAPP']) * self.VA_FACTOR,
@@ -247,6 +252,7 @@ class Teleinfo(RaspIotModule):
                         }
                         
                         #and emit events
+                        self.logger.trace(u'Send power update event with params: %s' % params)
                         self.power_update_event.send(params=params, device_id=self.__teleinfo_uuid)
                     else:
                         self.logger.warn(u'No intensity value in raw data %s' % self.last_raw)
