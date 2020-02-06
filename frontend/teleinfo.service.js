@@ -2,7 +2,7 @@
  * Teleinfo service
  * Handle teleinfo module requests
  */
-var teleinfoService = function($q, $rootScope, rpcService, raspiotService) {
+var teleinfoService = function($rootScope, rpcService, raspiotService) {
     var self = this;
     
     /**
@@ -39,5 +39,5 @@ var teleinfoService = function($q, $rootScope, rpcService, raspiotService) {
 };
     
 var RaspIot = angular.module('RaspIot');
-RaspIot.service('sensorsService', ['$q', '$rootScope', 'rpcService', 'raspiotService', sensorsService]);
+RaspIot.service('teleinfoService', ['$rootScope', 'rpcService', 'raspiotService', teleinfoService]);
 

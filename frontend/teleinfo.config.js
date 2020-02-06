@@ -31,7 +31,7 @@ var teleinfoConfigDirective = function(teleinfoService, raspiotService) {
         self.getTeleinfo = function() {
             teleinfoService.getTeleinfo()
                 .then(function(data) {
-                    self.teleinfo = data.toArray();
+                    self.teleinfo = data;
                 });
         };
 
@@ -52,5 +52,5 @@ var teleinfoConfigDirective = function(teleinfoService, raspiotService) {
 };
 
 var RaspIot = angular.module('RaspIot');
-RaspIot.directive('teleinfoConfigDirective', ['teleinfoService', teleinfoConfigDirective])
+RaspIot.directive('teleinfoConfigDirective', ['teleinfoService', 'raspiotService', teleinfoConfigDirective])
 

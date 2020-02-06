@@ -285,7 +285,16 @@ class Teleinfo(RaspIotModule):
         Return latest teleinfo data
 
         Returns:
-            dict: dict of teleinfo data according to user subscription (can be empty if no dongle configured)
+            dict: dict of teleinfo data according to user subscription (can be empty if no dongle configured)::
+
+                [
+                    {
+                        key (string): key of teleinfo item (IINST, DEMAIN, HCHC...),
+                        value (string): value of teleinfo item
+                    },
+                    ...
+                ]
+
         """
-        return self.last_raw
+        return [{'key':k, 'value':v} for k,v in self.last_raw.iteritems()]
 

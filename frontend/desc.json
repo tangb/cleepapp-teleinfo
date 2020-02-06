@@ -1,8 +1,8 @@
 {
     "icon": "transmission-tower",
     "global": {
-        "js": ["power.widget.js", "teleinfo.service.js"],
-        "html": ["power.widget.html"]
+        "js": ["teleinfo.widget.js", "teleinfo.service.js"],
+        "html": ["teleinfo.widget.html"]
     },
     "config": {
         "js": ["teleinfo.config.js"],

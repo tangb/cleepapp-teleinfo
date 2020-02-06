@@ -1,10 +1,10 @@
 /**
- * Power widget
- * Display power dashboard widget
+ * Teleinfo widget
+ * Display teleinfo dashboard widget
  */
-var widgetPowerDirective = function(raspiotService, teleinfoService) {
+var widgetTeleinfoDirective = function(raspiotService, teleinfoService) {
 
-    var widgetPowerController = ['$scope', function($scope) {
+    var widgetTeleinfoController = ['$scope', function($scope) {
         var self = this;
         self.device = $scope.device;
         self.graphOptions = {
@@ -18,16 +18,16 @@ var widgetPowerDirective = function(raspiotService, teleinfoService) {
 
     return {
         restrict: 'EA',
-        templateUrl: 'power.widget.html',
+        templateUrl: 'teleinfo.widget.html',
         replace: true,
         scope: {
             'device': '='
         },
-        controller: widgetPowerController,
+        controller: widgetTeleinfoController,
         controllerAs: 'widgetCtl'
     };
 };
 
 var RaspIot = angular.module('RaspIot');
-RaspIot.directive('widgetPowerDirective', ['raspiotService', 'teleinfoService', widgetPowerDirective]);
+RaspIot.directive('widgetTeleinfoDirective', ['raspiotService', 'teleinfoService', widgetTeleinfoDirective]);
 
