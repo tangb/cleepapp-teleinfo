@@ -8,7 +8,6 @@ var widgetTeleinfoDirective = function(raspiotService, teleinfoService) {
         var self = this;
         self.device = $scope.device;
         self.hasCharts = raspiotService.isAppInstalled('charts');
-        console.log('hascharts', self.hasCharts);
         self.chartOptions = {
             'type': 'line',
             'fields': ['timestamp', 'power'],
