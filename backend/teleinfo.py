@@ -175,14 +175,15 @@ class Teleinfo(RaspIotModule):
             #previous day consumption is stored in configuration file to take care of device reboot
             if event[u'params'][u'hour']==0 and event[u'params'][u'minute']==0:
                 config = self._get_config()
-                params = {
-                    u'heurescreuses': config[u'previousconsoheurescreuses'] - self.__last_conso_heures_creuses,
-                    u'heurespleines': config[u'previousconsoheurespleines'] - self.__last_conso_heures_pleines,
-                }
+                if config[u'previousconsoheurescreuses'] and config[u'previousconsoheurespleines']:
+                    params = {
+                        u'heurescreuses': config[u'previousconsoheurescreuses'] - self.__last_conso_heures_creuses,
+                        u'heurespleines': config[u'previousconsoheurespleines'] - self.__last_conso_heures_pleines,
+                    }
 
-                #send consumption event
-                self.logger.trace(u'Send consumption update event with params: %s' % params)
-                self.consumption_update_event.send(params=params, device_id=self.__teleinfo_uuid)
+                    #send consumption event
+                    self.logger.trace(u'Send consumption update event with params: %s' % params)
+                    self.consumption_update_event.send(params=params, device_id=self.__teleinfo_uuid)
 
                 #save last power consumption in config file
                 self.logger.info(u'Save last power consumption of the day')
