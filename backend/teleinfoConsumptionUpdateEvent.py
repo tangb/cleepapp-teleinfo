@@ -10,8 +10,9 @@ class TeleinfoConsumptionUpdateEvent(Event):
 
     EVENT_NAME = u'teleinfo.consumption.update'
     EVENT_SYSTEM = False
-    EVENT_PARAMS = [u'heurescreuses', u'heurespleines']
+    EVENT_PARAMS = [u'lastupdate', u'heurescreuses', u'heurespleines']
     EVENT_CHARTABLE = True
+    EVENT_CHART_PARAMS = [u'heurescreuses', u'heurespleines']
 
     def __init__(self, bus, formatters_broker, events_broker):
         """ 
