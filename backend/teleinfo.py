@@ -11,7 +11,6 @@ from raspiot.libs.internals.task import Task
 from raspiot.raspiot import RaspIotModule
 from raspiot.utils import CATEGORIES
 import glob
-import teleinfo
 from teleinfo import Parser
 from teleinfo.hw_vendors import UTInfo2
 
@@ -112,11 +111,11 @@ class Teleinfo(RaspIotModule):
         }
 
         #get devices
-        for device in self._get_devices():
+        for uuid, device in self._get_devices().iteritems():
             if device[u'type']==u'teleinfoinstantpower':
-                self.instant_power_device_uuid = device[u'uuid']
+                self.instant_power_device_uuid = uuid
             elif device[u'type']==u'teleinfopowerconsumption':
-                self.power_consumption_device_uuid = device[u'uuid']
+                self.power_consumption_device_uuid = uuid
 
         #add missing devices
         if not self.instant_power_device_uuid:
@@ -129,6 +128,9 @@ class Teleinfo(RaspIotModule):
             if not device:
                 raise Exception(u'Unable to add new device')
             self.power_consumption_device_uuid = device[u'uuid']
+
+        self.logger.debug(u'Found instant power device %s' % self.instant_power_device_uuid)
+        self.logger.debug(u'Found power consumption device %s' % self.power_consumption_device_uuid)
 
     def __configure_hardware(self):
         """
