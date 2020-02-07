@@ -44,6 +44,7 @@ class Teleinfo(RaspIotModule):
 
     MODULE_CONFIG_FILE = u'teleinfo.conf'
     DEFAULT_CONFIG = {
+        u'port': None,
         u'previousconsoheurespleines': None,
         u'previousconsoheurescreuses': None,
     }
@@ -61,7 +62,6 @@ class Teleinfo(RaspIotModule):
             debug_enabled (bool): flag to set debug level to logger
         """
         #init
-        self.port = None #init here due to get_config overwritting
         RaspIotModule.__init__(self, bootstrap, debug_enabled)
 
         #members
@@ -75,18 +75,6 @@ class Teleinfo(RaspIotModule):
         self.power_update_event = self._get_event('teleinfo.power.update')
         self.consumption_update_event = self._get_event('teleinfo.consumption.update')
         
-    def _get_config(self):
-        """
-        Returns module configuration
-        It just returns port value
-
-        Returns:
-            dict: configuration
-        """
-        return {
-            u'port': self.port
-        }
-
     def _configure(self):
         """
         Configure module
@@ -133,12 +121,13 @@ class Teleinfo(RaspIotModule):
             return False
 
         #get only one device
-        self.port = devices[0]
-        self.logger.info(u'Using device "%s" as teleinfo port' % self.port)
+        port = devices[0]
+        self._set_config_field(u'port', port)
+        self.logger.info(u'Using device "%s" as teleinfo port' % port)
 
         #init parser
         try:
-            self.__teleinfo_parser = Parser(UTInfo2(port=self.port))
+            self.__teleinfo_parser = Parser(UTInfo2(port=port))
             return True
 
         except:
@@ -208,7 +197,7 @@ class Teleinfo(RaspIotModule):
         It also emit power event.
         """
         try:
-            if self.port:
+            if self._get_config_field(u'port'):
                 self.logger.trace(u'Update teleinfo')
 
                 #read teleinfo data
