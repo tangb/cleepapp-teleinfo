@@ -66,7 +66,8 @@ class Teleinfo(RaspIotModule):
 
         #members
         self.teleinfo_task = None
-        self.__teleinfo_uuid = None
+        self.instant_power_device_uuid = None
+        self.power_consumption_device_uuid = None
         self.__teleinfo_parser = None
         self.__last_conso_heures_creuses = 0
         self.__last_conso_heures_pleines = 0
@@ -79,23 +80,8 @@ class Teleinfo(RaspIotModule):
         """
         Configure module
         """
-        #add openweathermap device
-        if self._get_device_count()==0:
-            self._add_device({
-                u'type': u'teleinfo',
-                u'name': u'Teleinfo',
-                u'lastupdate': None,
-                u'power': 0,
-                u'mode': None,
-            })
-
-        #get device uuid
-        devices = self.get_module_devices()
-        if len(devices)==1:
-            self.__teleinfo_uuid = devices.keys()[0]
-        else:
-            #supposed to have only one device!
-            raise Exception(u'Teleinfo should handle only one device')
+        #configure devices
+        self.__configure_devices()
 
         #configure hardware
         if self.__configure_hardware():
@@ -104,6 +90,45 @@ class Teleinfo(RaspIotModule):
 
         #start teleinfo task
         self._start_teleinfo_task()
+
+    def __configure_devices(self):
+        """
+        Configure teleinfo devices
+        """
+        instant_power_default_device = {
+            u'type': u'teleinfoinstantpower',
+            u'name': u'Instant power',
+            u'lastupdate': None,
+            u'power': 0,
+            u'currentmode': None,
+            u'nextmode': None,
+        }
+        power_consumption_default_device = {
+            u'type': u'teleinfopowerconsumption',
+            u'name': u'Power consumption',
+            u'lastupdate': None,
+            u'heurescreuses': 0,
+            u'heurespleines': 0,
+        }
+
+        #get devices
+        for device in self._get_devices():
+            if device[u'type']==u'teleinfoinstantpower':
+                self.instant_power_device_uuid = device[u'uuid']
+            elif device[u'type']==u'teleinfopowerconsumption':
+                self.power_consumption_device_uuid = device[u'uuid']
+
+        #add missing devices
+        if not self.instant_power_device_uuid:
+            device = self._add_device(instant_power_default_device)
+            if not device:
+                raise Exception(u'Unable to add new device')
+            self.instant_power_device_uuid = device[u'uuid']
+        if not self.power_consumption_device_uuid:
+            device = self._add_device(power_consumption_default_device)
+            if not device:
+                raise Exception(u'Unable to add new device')
+            self.power_consumption_device_uuid = device[u'uuid']
 
     def __configure_hardware(self):
         """
@@ -177,13 +202,15 @@ class Teleinfo(RaspIotModule):
                 config = self._get_config()
                 if config[u'previousconsoheurescreuses'] and config[u'previousconsoheurespleines']:
                     params = {
+                        u'lastupdate': int(time.time()),
                         u'heurescreuses': config[u'previousconsoheurescreuses'] - self.__last_conso_heures_creuses,
                         u'heurespleines': config[u'previousconsoheurespleines'] - self.__last_conso_heures_pleines,
                     }
 
-                    #send consumption event
+                    #send consumption event and update device
                     self.logger.trace(u'Send consumption update event with params: %s' % params)
-                    self.consumption_update_event.send(params=params, device_id=self.__teleinfo_uuid)
+                    self._update_device(self.instant_power_device_uuid, params)
+                    self.consumption_update_event.send(params=params, device_id=self.instant_power_device_uuid)
 
                 #save last power consumption in config file
                 self.logger.info(u'Save last power consumption of the day')
@@ -251,7 +278,8 @@ class Teleinfo(RaspIotModule):
                         
                         #and emit events
                         self.logger.trace(u'Send power update event with params: %s' % params)
-                        self.power_update_event.send(params=params, device_id=self.__teleinfo_uuid)
+                        self._update_device(self.power_consumption_device_uuid, params)
+                        self.power_update_event.send(params=params, device_id=self.power_consumption_device_uuid)
                     else:
                         self.logger.warn(u'No intensity value in raw data %s' % self.last_raw)
 
