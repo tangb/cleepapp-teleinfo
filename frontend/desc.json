@@ -2,7 +2,7 @@
     "icon": "transmission-tower",
     "global": {
         "js": ["teleinfo.widget.js", "teleinfo.service.js"],
-        "html": ["teleinfo.widget.html"]
+        "html": ["teleinfo.widget.html", "teleinfoDialog..widget.html"]
     },
     "config": {
         "js": ["teleinfo.config.js"],

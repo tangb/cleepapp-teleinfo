@@ -12,39 +12,9 @@
     </md-card-header>
     <md-card-content layout="row" layout-align="space-around center" md-colors="{{widgetCtl.device.__widget.mdcolors}}">
         <!-- current mode -->
-        <div>
-            <md-icon md-svg-icon="circle-outline" ng-if="widgetCtl.device.currentmode=='TH..'">
-                <md-tooltip md-direction="top">Toutes les heures</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="circle-outline" ng-if="widgetCtl.device.currentmode=='HC..'">
-                <md-tooltip md-direction="top">Heures creuses</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="currency-usd-circle-outline" ng-if="widgetCtl.device.currentmode=='HP..'">
-                <md-tooltip md-direction="top">Heures pleines</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="circle-outline" ng-if="widgetCtl.device.currentmode=='HN..'">
-                <md-tooltip md-direction="top">Heures normales</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="currency-usd-circle-outline" ng-if="widgetCtl.device.currentmode=='PM..'">
-                <md-tooltip md-direction="top">Heure de pointe</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="circle-outline" style="color: blue;" ng-if="widgetCtl.device.currentmode=='HCJB'">
-                <md-tooltip md-direction="top">Heures creuses jours bleus</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="circle-outline" style="color: white;" ng-if="widgetCtl.device.currentmode=='HCJW'">
-                <md-tooltip md-direction="top">Heures creuses jours blancs</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="circle-outline" style="color: red;" ng-if="widgetCtl.device.currentmode=='HCJR'">
-                <md-tooltip md-direction="top">Heures creuses jours rouges</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="currency-usd-circle-outline" style="color: blue;" ng-if="widgetCtl.device.currentmode=='HPJB'">
-                <md-tooltip md-direction="top">Heures pleines jours bleus</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="currency-usd-circle-outline" style="color: white;" ng-if="widgetCtl.device.currentmode=='HPJW'">
-                <md-tooltip md-direction="top">Heures pleines jours blancs</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="currency-usd-circle-outline" style="color: red;" ng-if="widgetCtl.device.currentmode=='HPJR'">
-                <md-tooltip md-direction="top">Heures pleines jours rouges</md-tooltip>
+        <div ng-if="widgetCtl.device.currentmode">
+            <md-icon md-svg-icon="widgetCtl.currentModes[widgetCtl.device.currentmode].icon" style="{{widgetCtl.currentModes[widgetCtl.device.currentmode].style}}">
+                <md-tooltip md-direction="top">{{currency-usd-circle-outline.label}}</md-tooltip>
             </md-icon>
         </div>
             
@@ -54,26 +24,17 @@
         </div>
 
         <!-- next mode -->
-        <div>
-            <md-icon md-svg-icon="help-circle-outline" ng-if="widgetCtl.device.nextmode=='----'">
-                <md-tooltip md-direction="top">Couleur de demain inconnue</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="circle" style="color: blue;" ng-if="widgetCtl.device.nextmode=='BLEU'">
-                <md-tooltip md-direction="top">Couleur bleu</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="circle" style="color: white;" ng-if="widgetCtl.device.nextmode=='BLAN'">
-                <md-tooltip md-direction="top">Couleur blanc</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="circle" style="color: red;" ng-if="widgetCtl.device.nextmode=='ROUG'">
-                <md-tooltip md-direction="top">Couleur rouge</md-tooltip>
-            </md-icon>
-            <md-icon md-svg-icon="alarm" ng-if="widgetCtl.device.nextmode.indexOf('EJP')>=0">
-                <md-tooltip md-direction="top">{{widgetCtl.device.nextmode}}</md-tooltip>
+        <div ng-if="widgetCtl.device.nextmode">
+            <md-icon md-svg-icon="widgetCtl.currentModes[widgetCtl.device.nextmode].icon" style="{{widgetCtl.currentModes[widgetCtl.device.nextmode].style}}">
+                <md-tooltip md-direction="top">{{widgetCtl.currentModes[widgetCtl.device.nextmode].label}}</md-tooltip>
             </md-icon>
         </div>
     </md-card-content> 
     <md-card-actions layout="column" layout-align="start" ng-if="widgetCtl.hasCharts">
-        <div layout="column" layout-align="start" chart-button device="widgetCtl.device" chart-options="widgetCtl.chartOptions" button-label="Chart" button-class="md-raised"></div>
+        <md-button ng-click="widgetCtl.openDialog()" class="md-raised">
+            <md-icon md-svg-icon="chart-line"></md-icon>
+            Charts
+        </md-button>
     </md-card-actions>
     <md-card-footer>
         <md-icon md-svg-icon="clock">

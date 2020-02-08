@@ -1,0 +1,34 @@
+<md-dialog aria-label="Teleinfo dialog" flex="50">
+
+    <form ng-cloak>
+
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Teleinfo</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="teleinfoCtl.cancelDialog()" aria-label="Close dialog">
+                    <md-icon md-svg-icon="close"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <md-content>
+
+                <div layout="column">
+                    <md-list>
+                        <md-list-item>
+                            <chart device="teleinfoCtl.instantPowerDevice" options="teleinfoCtl.chartInstantPowerOptions" flex="100"></chart>
+                        </md-list-item>
+                        <md-list-item>
+                            <chart device="teleinfoCtl.powerConsumptionDevice" options="teleinfoCtl.chartPowerConsumptionOptions" flex="100"></chart>
+                        </md-list-item>
+                    </md-list>
+                </div>
+
+            </md-content>
+        </md-dialog-content>
+
+    </form>
+
+</md-dialog>
