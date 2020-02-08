@@ -2,7 +2,7 @@
  * Teleinfo widget
  * Display teleinfo dashboard widget
  */
-var widgetTeleinfoDirective = function(raspiotService, teleinfoService) {
+var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
 
     var widgetTeleinfoController = ['$scope', function($scope) {
         var self = this;
@@ -98,5 +98,5 @@ var widgetTeleinfoDirective = function(raspiotService, teleinfoService) {
 };
 
 var RaspIot = angular.module('RaspIot');
-RaspIot.directive('widgetTeleinfoDirective', ['raspiotService', 'teleinfoService', widgetTeleinfoDirective]);
+RaspIot.directive('widgetTeleinfoDirective', ['$mdDialog', 'raspiotService', widgetTeleinfoDirective]);
 
