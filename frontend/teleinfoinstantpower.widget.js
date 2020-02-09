@@ -84,7 +84,7 @@ var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
 
     return {
         restrict: 'EA',
-        templateUrl: 'teleinfo.widget.html',
+        templateUrl: 'teleinfoinstantpower.widget.html',
         replace: true,
         scope: {
             'device': '='
