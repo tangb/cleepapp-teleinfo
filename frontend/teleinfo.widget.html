@@ -6,27 +6,27 @@
             <md-icon md-svg-icon="transmission-tower"></md-icon>
         </md-card-avatar>
         <md-card-header-text>
-            <span class="md-title">{{widgetCtl.device.name}}</span>
-            <span class="md-subhead">{{widgetCtl.device.type}}</span>
+            <span class="md-title">Teleinfo</span>
+            <span class="md-subhead">teleinfo</span>
         </md-card-header-text>
     </md-card-header>
     <md-card-content layout="row" layout-align="space-around center" md-colors="{{widgetCtl.device.__widget.mdcolors}}">
         <!-- current mode -->
-        <div ng-if="widgetCtl.device.currentmode">
-            <md-icon md-svg-icon="widgetCtl.currentModes[widgetCtl.device.currentmode].icon" style="{{widgetCtl.currentModes[widgetCtl.device.currentmode].style}}">
+        <div ng-if="widgetCtl.instantPowerDevice.currentmode">
+            <md-icon md-svg-icon="{{widgetCtl.currentModes[widgetCtl.instantPowerDevice.currentmode].icon}}" ng-style="widgetCtl.currentModes[widgetCtl.instantPowerDevice.currentmode].style">
                 <md-tooltip md-direction="top">{{currency-usd-circle-outline.label}}</md-tooltip>
             </md-icon>
         </div>
             
         <!-- current consumption -->
         <div>
-            <span class="md-display-1">{{widgetCtl.device.power ? widgetCtl.device.power : '---'}}W</span>
+            <span class="md-display-1">{{widgetCtl.instantPowerDevice.power ? widgetCtl.instantPowerDevice.power : '---'}}W</span>
         </div>
 
         <!-- next mode -->
-        <div ng-if="widgetCtl.device.nextmode">
-            <md-icon md-svg-icon="widgetCtl.currentModes[widgetCtl.device.nextmode].icon" style="{{widgetCtl.currentModes[widgetCtl.device.nextmode].style}}">
-                <md-tooltip md-direction="top">{{widgetCtl.currentModes[widgetCtl.device.nextmode].label}}</md-tooltip>
+        <div ng-if="widgetCtl.instantPowerDevice.nextmode">
+            <md-icon md-svg-icon="{{widgetCtl.currentModes[widgetCtl.instantPowerDevice.nextmode].icon}}" ng-style="widgetCtl.currentModes[widgetCtl.instantPowerDevice.nextmode].style">
+                <md-tooltip md-direction="top">{{widgetCtl.currentModes[widgetCtl.instantPowerDevice.nextmode].label}}</md-tooltip>
             </md-icon>
         </div>
     </md-card-content> 
@@ -40,7 +40,7 @@
         <md-icon md-svg-icon="clock">
             <md-tooltip md-direction="top">Last update</md-tooltip>
         </md-icon>
-        <span>{{widgetCtl.device.lastupdate | hrDatetime:true}}</span>
+        <span>{{widgetCtl.instantPowerDevice.lastupdate | hrDatetime:true}}</span>
     </md-card-footer>
 </md-card>
 

@@ -6,13 +6,6 @@ var teleinfoService = function($rootScope, rpcService, raspiotService) {
     var self = this;
     
     /**
-     * Init module devices
-     */
-    self.initDevices = function(devices) {   
-        return devices;
-    };
-
-    /**
      * Get teleinfo data
      */
     self.getTeleinfo = function() {

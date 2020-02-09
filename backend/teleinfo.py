@@ -67,7 +67,6 @@ class Teleinfo(RaspIotModule):
         self.teleinfo_task = None
         self.instant_power_device_uuid = None
         self.power_consumption_device_uuid = None
-        self.teleinfo_device_uuid = None
         self.__teleinfo_parser = None
         self.__last_conso_heures_creuses = 0
         self.__last_conso_heures_pleines = 0
@@ -110,10 +109,6 @@ class Teleinfo(RaspIotModule):
             u'heurescreuses': 0,
             u'heurespleines': 0,
         }
-        teleinfo_default_device = {
-            u'type': u'teleinfo',
-            u'name': 'Teleinfo',
-        }
 
         #get devices
         for uuid, device in self._get_devices().iteritems():
@@ -121,8 +116,6 @@ class Teleinfo(RaspIotModule):
                 self.instant_power_device_uuid = uuid
             elif device[u'type']==u'teleinfopowerconsumption':
                 self.power_consumption_device_uuid = uuid
-            elif device[u'type']==u'teleinfo':
-                self.teleinfo_device_uuid = uuid
 
         #add missing devices
         if not self.instant_power_device_uuid:
@@ -137,17 +130,9 @@ class Teleinfo(RaspIotModule):
             if not device:
                 raise Exception(u'Unable to add new device')
             self.power_consumption_device_uuid = device[u'uuid']
-        if not self.teleinfo_device_uuid:
-            #this device is only used to display one item in dashboard
-            self.logger.debug(u'Adding new teleinfo device')
-            device = self._add_device(teleinfo_default_device)
-            if not device:
-                raise Exception(u'Unable to add new device')
-            self.teleinfo_device_uuid = device[u'uuid']
 
         self.logger.debug(u'Found instant power device "%s"' % self.instant_power_device_uuid)
         self.logger.debug(u'Found power consumption device "%s"' % self.power_consumption_device_uuid)
-        self.logger.debug(u'Found teleinfo device "%s"' % self.teleinfo_device_uuid)
 
     def __configure_hardware(self):
         """

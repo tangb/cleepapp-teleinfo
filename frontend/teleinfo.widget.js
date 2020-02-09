@@ -6,7 +6,8 @@ var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
 
     var widgetTeleinfoController = ['$scope', function($scope) {
         var self = this;
-        self.device = $scope.device;
+        self.instantPowerDevice = $scope.device;
+        self.powerConsumptionDevice = null;
         self.hasCharts = raspiotService.isAppInstalled('charts');
         self.chartInstantPowerOptions = {
             'type': 'line',
@@ -21,8 +22,6 @@ var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
             'label': 'Power consumption (W)'
         };
         self.hasDatabase = raspiotService.isAppInstalled('database');
-        self.instantPowerDevice = null;
-        self.powerConsumptionDevice = null;
         self.nextModes = {
             '----': { 'label': 'Couleur de demain inconnue', 'icon': 'help-circle-outline', 'style': '' },
             'BLEU': { 'label': 'Couleur bleu', 'icon': 'circle', 'style': 'color: blue;' },
@@ -59,8 +58,7 @@ var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
         /**
          * Cancel dialog
          */
-        self.cancelDialog = function()
-        {
+        self.cancelDialog = function() {
             $mdDialog.cancel();
         };
 
@@ -70,20 +68,19 @@ var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
         self.init = function()
         {
             //get teleinfo devices
-            for( var i=0; i<raspiotService.devices.length; i++ )
-            {
-                if( raspiotService.devices[i].type==='teleinfoinstantpower' )
-                {
-                    self.instantPowerDevice = raspiotService.devices[i];
-                }
-                else if( raspiotService.devices[i].type==='teleinfopowerconsumption' )
-                {
+            for( var i=0; i<raspiotService.devices.length; i++ ) {
+                if( raspiotService.devices[i].type==='teleinfopowerconsumption' ) {
                     self.powerConsumptionDevice = raspiotService.devices[i];
+                    break;
                 }
             }
         };
 
     }];
+
+    var widgetTeleinfoLink = function(scope, element, attrs, controller) {
+        controller.init();
+    };
 
     return {
         restrict: 'EA',
@@ -93,7 +90,8 @@ var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
             'device': '='
         },
         controller: widgetTeleinfoController,
-        controllerAs: 'widgetCtl'
+        controllerAs: 'widgetCtl',
+        link: widgetTeleinfoLink
     };
 };
 
