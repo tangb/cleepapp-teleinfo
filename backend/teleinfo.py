@@ -199,28 +199,28 @@ class Teleinfo(RaspIotModule):
             event (MessageRequest): event data
         """
         self.logger.trace(u'Event received %s' % event)
-        if event[u'event']==u'parameters.time.now':
-            #compute and send consumption event once a day at midnight
-            #previous day consumption is stored in configuration file to take care of device reboot
-            if event[u'params'][u'hour']==0 and event[u'params'][u'minute']==0:
+        #compute and send consumption event once a day at midnight
+        #previous day consumption is stored in configuration file to take care of device reboot
+        #if event[u'event']==u'parameters.time.now' and event[u'params'][u'hour']==0 and event[u'params'][u'minute']==0:
+        if event[u'event']==u'parameters.time.now' and event[u'params'][u'minute']==0:
                 config = self._get_config()
-                if config[u'previousconsoheurescreuses'] and config[u'previousconsoheurespleines']:
+                if config[u'previousconsoheurescreuses'] is not None and config[u'previousconsoheurespleines'] is not None:
                     params = {
                         u'lastupdate': int(time.time()),
-                        u'heurescreuses': config[u'previousconsoheurescreuses'] - self.__last_conso_heures_creuses,
-                        u'heurespleines': config[u'previousconsoheurespleines'] - self.__last_conso_heures_pleines,
+                        u'heurescreuses': (self.__last_conso_heures_creuses - config[u'previousconsoheurescreuses']),
+                        u'heurespleines': (self.__last_conso_heures_pleines - config[u'previousconsoheurespleines']),
                     }
 
                     #send consumption event and update device
                     self.logger.trace(u'Send consumption update event with params: %s' % params)
                     self._update_device(self.instant_power_device_uuid, params)
-                    self.consumption_update_event.send(params=params, device_id=self.instant_power_device_uuid)
+                    self.consumption_update_event.send(params=params, device_id=self.power_consumption_device_uuid)
 
                 #save last power consumption in config file
                 self.logger.info(u'Save last power consumption of the day')
                 self._update_config({
-                    u'previousconsoheurescreuses', self.__last_conso_heures_creuses,
-                    u'previousconsoheurespleines', self.__last_conso_heures_pleines,
+                    u'previousconsoheurescreuses': self.__last_conso_heures_creuses,
+                    u'previousconsoheurespleines': self.__last_conso_heures_pleines,
                 })
 
     def _teleinfo_task(self):
@@ -282,8 +282,8 @@ class Teleinfo(RaspIotModule):
                         
                         #and emit events
                         self.logger.trace(u'Send power update event with params: %s' % params)
-                        self._update_device(self.power_consumption_device_uuid, params)
-                        self.power_update_event.send(params=params, device_id=self.power_consumption_device_uuid)
+                        self._update_device(self.instant_power_device_uuid, params)
+                        self.power_update_event.send(params=params, device_id=self.instant_power_device_uuid)
                     else:
                         self.logger.warn(u'No intensity value in raw data %s' % self.last_raw)
 
