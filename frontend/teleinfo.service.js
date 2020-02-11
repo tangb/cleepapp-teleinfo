@@ -16,10 +16,8 @@ var teleinfoService = function($rootScope, rpcService, raspiotService) {
      * Catch power update event
      */
     $rootScope.$on('teleinfo.power.update', function(event, uuid, params) {
-        for( var i=0; i<raspiotService.devices.length; i++ )
-        {   
-            if( raspiotService.devices[i].uuid===uuid )
-            {   
+        for( var i=0; i<raspiotService.devices.length; i++ ) {   
+            if( raspiotService.devices[i].uuid===uuid ) {
                 raspiotService.devices[i].lastupdate = params.lastupdate;
                 raspiotService.devices[i].power = params.power;
                 raspiotService.devices[i].currentmode = params.currentmode;

@@ -10,16 +10,18 @@ var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
         self.powerConsumptionDevice = null;
         self.hasCharts = raspiotService.isAppInstalled('charts');
         self.chartInstantPowerOptions = {
+            'title': 'Instant power',
             'type': 'line',
             'fields': ['timestamp', 'power'],
             'color': '#FF6600',
-            'label': 'Instant power (W)'
+            'label': 'Power (W)'
         };
         self.chartPowerConsumptionOptions = {
+            'title': 'Power consumption',
             'type': 'bar',
             'fields': ['timestamp', 'heurescreuses', 'heurespleines'],
             'color': '#0000FF',
-            'label': 'Power consumption (W)'
+            'label': 'Power (W)'
         };
         self.hasDatabase = raspiotService.isAppInstalled('database');
         self.nextModes = {
@@ -96,5 +98,5 @@ var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
 };
 
 var RaspIot = angular.module('RaspIot');
-RaspIot.directive('widgetTeleinfoDirective', ['$mdDialog', 'raspiotService', widgetTeleinfoDirective]);
+RaspIot.directive('widgetTeleinfoinstantpowerDirective', ['$mdDialog', 'raspiotService', widgetTeleinfoDirective]);
 
