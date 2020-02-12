@@ -13,14 +13,14 @@ var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
             'title': 'Instant power',
             'type': 'line',
             'fields': ['timestamp', 'power'],
-            'color': '#FF6600',
+            'color': '#FF5722',
             'label': 'Power (W)'
         };
         self.chartPowerConsumptionOptions = {
             'title': 'Power consumption',
-            'type': 'bar',
+            'type': 'multibar',
             'fields': ['timestamp', 'heurescreuses', 'heurespleines'],
-            'color': '#0000FF',
+            'color': ['#2196F3', '#FF0000'],
             'label': 'Power (W)'
         };
         self.hasDatabase = raspiotService.isAppInstalled('database');
