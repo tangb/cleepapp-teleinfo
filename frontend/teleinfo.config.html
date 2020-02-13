@@ -1,32 +1,42 @@
 <div layout="column" layout-padding ng-cloak>
 
-    <md-list>
+    <!-- navigation tabs -->
+    <md-nav-bar md-selected-nav-item="teleinfoCtl.tabIndex" nav-bar-aria-label="System tabs">
+        <md-nav-item md-nav-click="goto('teleinfo')" name="teleinfo">Teleinfo infos</md-nav-item>
+        <md-nav-item md-nav-click="goto('install')" name="install">Installation</md-nav-item>
+    </md-nav-bar>
 
-        <md-subheader class="md-no-sticky">Teleinfo device</md-subheader>
-        <md-list-item>
-            <span>Dongle port</span>
-            <div class="md-secondary">
-                {{teleinfoCtl.port ? teleinfoCtl.port : 'Not found'}}
-            </div>
-        </md-list-item>
+    <!-- install tab -->
+	<div layout="column" layout-padding ng-if="teleinfoCtl.tabIndex=='install'">
+        <md-list>
+            <md-subheader class="md-no-sticky">Teleinfo device</md-subheader>
+            <md-list-item>
+                <span>Dongle port</span>
+                <div class="md-secondary">
+                    {{teleinfoCtl.port ? teleinfoCtl.port : 'Not found'}}
+                </div>
+            </md-list-item>
+        </md-list>
+    <div>
 
-        <md-divider></md-divider>
-        
-        <md-subheader class="md-no-sticky">Current teleinfo informations</md-subheader>
-        <md-list-item ng-if="teleinfoCtl.teleinfo.length===0">
-            <span>No data</span>
-        </md-list-item>
-        <md-list-item ng-repeat="item in teleinfoCtl.teleinfo" class="md-2-line" ng-click="null">
-            <div class="md-list-item-text">
-                <h3>{{item.label}}</h3>
-                <p>{{item.key}}</p>
-            </div>
-            <div class="md-secondary">
-                {{item.value}} {{item.unit}}
-            </div>
-        </md-list-item>
-
-    </md-list>
+    <!-- teleinfo tab -->
+	<div layout="column" layout-padding ng-if="teleinfoCtl.tabIndex=='teleinfo'">
+        <md-list>
+            <md-subheader class="md-no-sticky">Current teleinfo informations</md-subheader>
+            <md-list-item ng-if="teleinfoCtl.teleinfo.length===0">
+                <span>No data</span>
+            </md-list-item>
+            <md-list-item ng-repeat="item in teleinfoCtl.teleinfo" class="md-2-line" ng-click="null">
+                <div class="md-list-item-text">
+                    <h3>{{item.label}}</h3>
+                    <p>{{item.key}}</p>
+                </div>
+                <div class="md-secondary">
+                    {{item.value}} {{item.unit}}
+                </div>
+            </md-list-item>
+        </md-list>
+    </div>
 
 </div>
 

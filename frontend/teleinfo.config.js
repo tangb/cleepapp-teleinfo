@@ -7,6 +7,7 @@ var teleinfoConfigDirective = function(teleinfoService, raspiotService) {
     var teleinfoController = function()
     {
         var self = this;
+        self.tabIndex = 'teleinfo';
         self.port = '';
         self.teleinfo = [];
         self.extra = {
@@ -43,6 +44,10 @@ var teleinfoConfigDirective = function(teleinfoService, raspiotService) {
             raspiotService.getModuleConfig('teleinfo')
                 .then(function(config) {
                     self.port = config.port
+                    if( !self.port ) {
+                        // switch to install tab if port not specified
+                        self.tabIndex = 'install';
+                    }
                 })
                 .then(function() {
                     // load current teleinfo data
