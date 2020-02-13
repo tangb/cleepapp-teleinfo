@@ -201,8 +201,7 @@ class Teleinfo(RaspIotModule):
         self.logger.trace(u'Event received %s' % event)
         #compute and send consumption event once a day at midnight
         #previous day consumption is stored in configuration file to take care of device reboot
-        #if event[u'event']==u'parameters.time.now' and event[u'params'][u'hour']==0 and event[u'params'][u'minute']==0:
-        if event[u'event']==u'parameters.time.now' and event[u'params'][u'minute']==0:
+        if event[u'event']==u'parameters.time.now' and event[u'params'][u'hour']==0 and event[u'params'][u'minute']==0:
                 config = self._get_config()
                 if config[u'previousconsoheurescreuses'] is not None and config[u'previousconsoheurespleines'] is not None:
                     params = {
