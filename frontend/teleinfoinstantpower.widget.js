@@ -21,7 +21,10 @@ var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
             'type': 'multibar',
             'fields': ['timestamp', 'heurescreuses', 'heurespleines'],
             'color': ['#2196F3', '#FF0000'],
-            'label': 'Power (W)'
+            'label': 'Power (W)',
+            'timerange': {
+                'predefined': 604800,
+            },
         };
         self.hasDatabase = raspiotService.isAppInstalled('database');
         self.nextModes = {
