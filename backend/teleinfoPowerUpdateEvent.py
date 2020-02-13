@@ -14,7 +14,10 @@ class TeleinfoPowerUpdateEvent(Event):
         u'lastupdate',
         u'power', # puissance instantanée
         u'currentmode', # mode courant
-        u'nextmode' # prochain mode
+        u'nextmode', # prochain mode
+        u'heurescreuses', #index HC ou BASE
+        u'heurespleines', #index HP
+        u'subscription', #abonnement
     ]
     EVENT_CHARTABLE = True
     EVENT_CHART_PARAMS = [u'power']

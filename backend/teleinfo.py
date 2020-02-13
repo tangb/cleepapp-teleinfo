@@ -276,7 +276,10 @@ class Teleinfo(RaspIotModule):
                             u'lastupdate': int(time.time()),
                             u'power': int(self.last_raw[u'IINST']) * self.VA_FACTOR,
                             u'currentmode': self.last_raw[u'PTEC'] if u'PTEC' in self.last_raw else None,
-                            u'nextmode': next_mode
+                            u'nextmode': next_mode,
+                            u'heurescreuses': self.__last_conso_heures_creuses,
+                            u'heurespleines': self.__last_conso_heures_pleines,
+                            u'subscription': self.last_raw[u'ISOUSC'] if u'ISOUSC' in self.last_raw else None,
                         }
                         
                         #and emit events
