@@ -1,5 +1,6 @@
 **/*.pyc
 **/.coverage
+**/*.swp
 docs/*.zip
 docs/*.txt
 docs/*.xml
