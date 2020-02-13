@@ -36,15 +36,15 @@ var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
         self.currentModes = {
             'TH..': { 'label': 'Toutes les heures', 'icon': 'circle-outline', 'style': '' },
             'HC..': { 'label': 'Heures creuses', 'icon': 'circle-outline', 'style': '' },
-            'HP..': { 'label': 'Heures pleines', 'icon': 'currency-usd-circle-outline', 'style': '' },
+            'HP..': { 'label': 'Heures pleines', 'icon': 'currency-usd-circle', 'style': '' },
             'HN..': { 'label': 'Heures normales', 'icon': 'circle-outline', 'style': '' },
-            'PM..': { 'label': 'Heures de pointe', 'icon': 'currency-usd-circle-outline', 'style': '' },
+            'PM..': { 'label': 'Heures de pointe', 'icon': 'currency-usd-circle', 'style': '' },
             'HCJB': { 'label': 'Heures creuses jours bleus', 'icon': 'circle-outline', 'style': 'color: blue;' },
             'HCJW': { 'label': 'Heures creuses jours blancs', 'icon': 'circle-outline', 'style': 'color: white;' },
             'HCJR': { 'label': 'Heures creuses jours rouges', 'icon': 'circle-outline', 'style': 'color: red;' },
-            'HPJB': { 'label': 'Heures pleines jours bleus', 'icon': 'currency-usd-circle-outline', 'style': 'color: blue;' },
+            'HPJB': { 'label': 'Heures pleines jours bleus', 'icon': 'circle-outline', 'style': 'color: blue;' },
             'HPJW': { 'label': 'Heures pleines jours blancs', 'icon': 'currency-usd-circle-outline', 'style': 'color: white;' },
-            'HPJR': { 'label': 'Heures pleines jours rouges', 'icon': 'currency-usd-circle-outline', 'style': 'color: red;' },
+            'HPJR': { 'label': 'Heures pleines jours rouges', 'icon': 'currency-usd-circle', 'style': 'color: red;' },
         };
 
         /** 
