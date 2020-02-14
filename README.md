@@ -2,6 +2,8 @@
 
 Teleinfo module for Cleep
 
+![alt text](https://github.com/tangb/cleepmod-teleinfo/raw/master/resources/linky.jpg)
+
 ## Teleinfo
 Teleinfo is France Enedys (ex EDF) energy provider protocol for their home electric meters.
 
