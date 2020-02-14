@@ -1,4 +1,4 @@
-<md-dialog aria-label="Teleinfo dialog" flex="50">
+<md-dialog aria-label="Teleinfo dialog" flex="70">
 
     <form ng-cloak>
 
@@ -12,21 +12,51 @@
             </div>
         </md-toolbar>
 
-        <md-dialog-content>
-            <md-content>
+        <md-dialog-content style="height: 575px;">
 
-                <div layout="column">
-                    <md-list>
-                        <md-list-item>
-                            <chart device="teleinfoCtl.instantPowerDevice" options="teleinfoCtl.chartInstantPowerOptions" flex="100"></chart>
-                        </md-list-item>
-                        <md-list-item>
-                            <chart device="teleinfoCtl.powerConsumptionDevice" options="teleinfoCtl.chartPowerConsumptionOptions" flex="100"></chart>
-                        </md-list-item>
-                    </md-list>
-                </div>
+            <!-- navigation -->
+            <md-nav-bar md-selected-nav-item="teleinfoCtl.tabIndex" nav-bar-aria-label="Teleinfo tabs">
+                <md-nav-item md-nav-click="goto('instant')" name="instant">Instant power</md-nav-item>
+                <md-nav-item md-nav-click="goto('consumption')" name="consumption">Power consumption</md-nav-item>
+                <md-nav-item md-nav-click="goto('infos')" name="infos">Informations</md-nav-item>
+            </md-nav-bar>
 
-            </md-content>
+            <!-- instant power tab -->
+            <div layout="column" layout-padding ng-if="teleinfoCtl.tabIndex==='instant'">
+                <md-list>
+                    <md-list-item>
+                        <chart device="teleinfoCtl.instantPowerDevice" options="teleinfoCtl.chartInstantPowerOptions" flex="100"></chart>
+                    </md-list-item>
+                </md-list>
+            </div>
+
+            <!-- power consumption tab -->
+            <div layout="column" layout-padding ng-if="teleinfoCtl.tabIndex==='consumption'">
+                <md-list>
+                    <md-list-item>
+                        <chart device="teleinfoCtl.powerConsumptionDevice" options="teleinfoCtl.chartPowerConsumptionOptions" flex="100"></chart>
+                    </md-list-item>
+                </md-list>
+            </div>
+
+            <!-- infos tab -->
+            <div layout="column" layout-padding ng-if="teleinfoCtl.tabIndex==='infos'">
+                <md-list>
+                    <md-list-item>
+                        <p>Index heures creuses</p>
+                        <div class="md-secondary">{{teleinfoCtl.instantPowerDevice.heurescreuses}} Wh</div>
+                    </md-list-item>
+                    <md-list-item>
+                        <p>Index heures pleines</p>
+                        <div class="md-secondary">{{teleinfoCtl.instantPowerDevice.heurespleines}} Wh</div>
+                    </md-list-item>
+                    <md-list-item>
+                        <p>Intensité souscrite</p>
+                        <div class="md-secondary">{{teleinfoCtl.instantPowerDevice.subscription}} A</div>
+                    </md-list-item>
+                </md-list>
+            </div>
+                
         </md-dialog-content>
 
     </form>

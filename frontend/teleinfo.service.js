@@ -22,6 +22,9 @@ var teleinfoService = function($rootScope, rpcService, raspiotService) {
                 raspiotService.devices[i].power = params.power;
                 raspiotService.devices[i].currentmode = params.currentmode;
                 raspiotService.devices[i].nextmode = params.nextmode;
+                raspiotService.devices[i].heurescreuses = params.heurescreuses;
+                raspiotService.devices[i].heurespleines = params.heurespleines;
+                raspiotService.devices[i].subscription = params.subscription;
                 break;
             }   
         }   

@@ -6,18 +6,17 @@ var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
 
     var widgetTeleinfoController = ['$scope', function($scope) {
         var self = this;
+        self.tabIndex = 'instant';
         self.instantPowerDevice = $scope.device;
         self.powerConsumptionDevice = null;
         self.hasCharts = raspiotService.isAppInstalled('charts');
         self.chartInstantPowerOptions = {
-            'title': 'Instant power',
             'type': 'line',
             'fields': ['timestamp', 'power'],
             'color': '#FF5722',
             'label': 'Power (W)'
         };
         self.chartPowerConsumptionOptions = {
-            'title': 'Power consumption',
             'type': 'multibar',
             'fields': ['timestamp', 'heurescreuses', 'heurespleines'],
             'color': ['#2196F3', '#FF0000'],
@@ -50,13 +49,15 @@ var widgetTeleinfoDirective = function($mdDialog, raspiotService) {
         /** 
          * Open dialog
          */
-        self.openDialog = function() {
+        self.openDialog = function(ev) {
             $mdDialog.show({
                 controller: function() { return self; },
                 controllerAs: 'teleinfoCtl',
                 templateUrl: 'teleinfoDialog.widget.html',
                 parent: angular.element(document.body),
                 clickOutsideToClose: true,
+                targetEvent: ev,
+                fullscreen: true,
             }); 
         };
 
