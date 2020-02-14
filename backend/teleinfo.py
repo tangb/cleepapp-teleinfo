@@ -202,25 +202,25 @@ class Teleinfo(RaspIotModule):
         #compute and send consumption event once a day at midnight
         #previous day consumption is stored in configuration file to take care of device reboot
         if event[u'event']==u'parameters.time.now' and event[u'params'][u'hour']==0 and event[u'params'][u'minute']==0:
-                config = self._get_config()
-                if config[u'previousconsoheurescreuses'] is not None and config[u'previousconsoheurespleines'] is not None:
-                    params = {
-                        u'lastupdate': int(time.time()),
-                        u'heurescreuses': (self.__last_conso_heures_creuses - config[u'previousconsoheurescreuses']),
-                        u'heurespleines': (self.__last_conso_heures_pleines - config[u'previousconsoheurespleines']),
-                    }
+            config = self._get_config()
+            if config[u'previousconsoheurescreuses'] is not None and config[u'previousconsoheurespleines'] is not None:
+                params = {
+                    u'lastupdate': int(time.time()),
+                    u'heurescreuses': (self.__last_conso_heures_creuses - config[u'previousconsoheurescreuses']),
+                    u'heurespleines': (self.__last_conso_heures_pleines - config[u'previousconsoheurespleines']),
+                }
 
-                    #send consumption event and update device
-                    self.logger.trace(u'Send consumption update event with params: %s' % params)
-                    self._update_device(self.instant_power_device_uuid, params)
-                    self.consumption_update_event.send(params=params, device_id=self.power_consumption_device_uuid)
+                #send consumption event and update device
+                self.logger.trace(u'Send consumption update event with params: %s' % params)
+                self._update_device(self.instant_power_device_uuid, params)
+                self.consumption_update_event.send(params=params, device_id=self.power_consumption_device_uuid)
 
-                #save last power consumption in config file
-                self.logger.info(u'Save last power consumption of the day')
-                self._update_config({
-                    u'previousconsoheurescreuses': self.__last_conso_heures_creuses,
-                    u'previousconsoheurespleines': self.__last_conso_heures_pleines,
-                })
+            #save last power consumption in config file
+            self.logger.info(u'Save last power consumption of the day')
+            self._update_config({
+                u'previousconsoheurescreuses': self.__last_conso_heures_creuses,
+                u'previousconsoheurespleines': self.__last_conso_heures_pleines,
+            })
 
     def _teleinfo_task(self):
         """
@@ -228,66 +228,69 @@ class Teleinfo(RaspIotModule):
         It also emit power event.
         """
         try:
-            if self._get_config_field(u'port'):
-                self.logger.trace(u'Update teleinfo')
+            if not self._get_config_field(u'port'):
+                return
 
-                #read teleinfo data
-                self.last_raw = self._get_teleinfo_raw_data()
-                self.logger.debug(u'Raw teleinfo: %s' % self.last_raw)
+            self.logger.trace(u'Update teleinfo')
 
-                #compute some values
-                if self.last_raw:
-                    keys = set(self.last_raw.keys())
+            #read teleinfo data
+            self.last_raw = self._get_teleinfo_raw_data()
+            self.logger.debug(u'Raw teleinfo: %s' % self.last_raw)
 
-                    #power consumption
-                    if set([u'HCHC', u'HCHP']).issubset(keys):
-                        #handle heures creuses/pleines
-                        self.logger.trace(u'Handle heures creuses/pleines')
-                        self.__last_conso_heures_creuses = int(self.last_raw[u'HCHC'])
-                        self.__last_conso_heures_pleines = int(self.last_raw[u'HCHP'])
-                    elif set([u'EJPHN', u'EJPHPM']).issubset(keys):
-                        #handle EJP
-                        self.logger.trace(u'Handle EJP')
-                        self.__last_conso_heures_creuses = int(self.last_raw[u'EJPHN'])
-                        self.__last_conso_heures_pleines = int(self.last_raw[u'EJPHPM'])
-                    elif set([u'BBRHCJB', u'BBRHPJB', u'BBRHCJW', u'BBRHPJW', u'BBRHCJR', u'BBRHPJR']).issubset(keys):
-                        #handle Tempo
-                        self.logger.trace(u'Handle Tempo')
-                        self.__last_conso_heures_creuses = int(self.last_raw[u'BBRHCJB']) + int(self.last_raw[u'BBRHCJW']) + int(self.last_raw[u'BBRHCJR'])
-                        self.__last_conso_heures_pleines = int(self.last_raw[u'BBRHPJB']) + int(self.last_raw[u'BBRHPJW']) + int(self.last_raw[u'BBRHPJR'])
-                    elif set([u'BASE']).issubset(keys):
-                        #handle Base
-                        self.logger.trace(u'Handle Base')
-                        self.__last_conso_heures_creuses = int(self.last_raw[u'BASE'])
-                        self.__last_conso_heures_pleines = 0
-                    else:
-                        self.logger.warn(u'No consumption value in raw data %s' % self.last_raw)
+            #compute some values
+            if not self.last_raw:
+                return
 
-                    #instant power
-                    if set([u'IINST']).issubset(keys):
-                        #handle next mode
-                        next_mode = None
-                        if set([u'DEMAIN']).issubset(keys):
-                            next_mode = self.last_raw[u'DEMAIN']
-                        elif set([u'PEJP']).issubset(keys):
-                            next_mode = u'EJP in %s mins' % self.last_raw[u'PEJP']
+            keys = set(self.last_raw.keys())
+            #power consumption
+            if set([u'HCHC', u'HCHP']).issubset(keys):
+                #handle heures creuses/pleines
+                self.logger.trace(u'Handle heures creuses/pleines')
+                self.__last_conso_heures_creuses = int(self.last_raw[u'HCHC'])
+                self.__last_conso_heures_pleines = int(self.last_raw[u'HCHP'])
+            elif set([u'EJPHN', u'EJPHPM']).issubset(keys):
+                #handle EJP
+                self.logger.trace(u'Handle EJP')
+                self.__last_conso_heures_creuses = int(self.last_raw[u'EJPHN'])
+                self.__last_conso_heures_pleines = int(self.last_raw[u'EJPHPM'])
+            elif set([u'BBRHCJB', u'BBRHPJB', u'BBRHCJW', u'BBRHPJW', u'BBRHCJR', u'BBRHPJR']).issubset(keys):
+                #handle Tempo
+                self.logger.trace(u'Handle Tempo')
+                self.__last_conso_heures_creuses = int(self.last_raw[u'BBRHCJB']) + int(self.last_raw[u'BBRHCJW']) + int(self.last_raw[u'BBRHCJR'])
+                self.__last_conso_heures_pleines = int(self.last_raw[u'BBRHPJB']) + int(self.last_raw[u'BBRHPJW']) + int(self.last_raw[u'BBRHPJR'])
+            elif set([u'BASE']).issubset(keys):
+                #handle Base
+                self.logger.trace(u'Handle Base')
+                self.__last_conso_heures_creuses = int(self.last_raw[u'BASE'])
+                self.__last_conso_heures_pleines = 0
+            else:
+                self.logger.debug(u'No consumption value in raw data %s' % self.last_raw)
 
-                        params = {
-                            u'lastupdate': int(time.time()),
-                            u'power': int(self.last_raw[u'IINST']) * self.VA_FACTOR,
-                            u'currentmode': self.last_raw[u'PTEC'] if u'PTEC' in self.last_raw else None,
-                            u'nextmode': next_mode,
-                            u'heurescreuses': self.__last_conso_heures_creuses,
-                            u'heurespleines': self.__last_conso_heures_pleines,
-                            u'subscription': self.last_raw[u'ISOUSC'] if u'ISOUSC' in self.last_raw else None,
-                        }
-                        
-                        #and emit events
-                        self.logger.trace(u'Send power update event with params: %s' % params)
-                        self._update_device(self.instant_power_device_uuid, params)
-                        self.power_update_event.send(params=params, device_id=self.instant_power_device_uuid)
-                    else:
-                        self.logger.warn(u'No intensity value in raw data %s' % self.last_raw)
+            #instant power
+            if set([u'IINST']).issubset(keys):
+                #handle next mode
+                next_mode = None
+                if set([u'DEMAIN']).issubset(keys):
+                    next_mode = self.last_raw[u'DEMAIN']
+                elif set([u'PEJP']).issubset(keys):
+                    next_mode = u'EJP in %s mins' % self.last_raw[u'PEJP']
+
+                params = {
+                    u'lastupdate': int(time.time()),
+                    u'power': int(self.last_raw[u'IINST']) * self.VA_FACTOR,
+                    u'currentmode': self.last_raw[u'PTEC'] if u'PTEC' in self.last_raw else None,
+                    u'nextmode': next_mode,
+                    u'heurescreuses': self.__last_conso_heures_creuses,
+                    u'heurespleines': self.__last_conso_heures_pleines,
+                    u'subscription': self.last_raw[u'ISOUSC'] if u'ISOUSC' in self.last_raw else None,
+                }
+                    
+                #and emit events
+                self.logger.trace(u'Send power update event with params: %s' % params)
+                self._update_device(self.instant_power_device_uuid, params)
+                self.power_update_event.send(params=params, device_id=self.instant_power_device_uuid)
+            else:
+                self.logger.debug(u'No intensity value in raw data %s' % self.last_raw)
 
         except Exception as e:
             self.logger.exception(u'Exception during teleinfo task:')
@@ -297,7 +300,7 @@ class Teleinfo(RaspIotModule):
         Get teleinfo raw data from power meter
 
         Returns:
-            dict: raw teleinfo data or empty if no dongle not connected
+            dict: raw teleinfo data or empty if no dongle connected
         """
         if self.__teleinfo_parser:
             return self.__teleinfo_parser.get_frame()
