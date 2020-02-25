@@ -67,6 +67,7 @@ class Teleinfo(RaspIotModule):
         self.teleinfo_task = None
         self.instant_power_device_uuid = None
         self.power_consumption_device_uuid = None
+        self.last_raw = {}
         self.__teleinfo_parser = None
         self.__last_conso_heures_creuses = 0
         self.__last_conso_heures_pleines = 0
@@ -80,17 +81,17 @@ class Teleinfo(RaspIotModule):
         Configure module
         """
         #configure devices
-        self.__configure_devices()
+        self._configure_devices()
 
         #configure hardware
-        if self.__configure_hardware():
+        if self._configure_hardware():
             #update values at startup
             self._teleinfo_task()
 
         #start teleinfo task
         self._start_teleinfo_task()
 
-    def __configure_devices(self):
+    def _configure_devices(self):
         """
         Configure teleinfo devices
         """
@@ -121,20 +122,20 @@ class Teleinfo(RaspIotModule):
         if not self.instant_power_device_uuid:
             self.logger.debug(u'Adding new instant power device')
             device = self._add_device(instant_power_default_device)
-            if not device:
+            if not device: # pragma: no cover
                 raise Exception(u'Unable to add new device')
             self.instant_power_device_uuid = device[u'uuid']
         if not self.power_consumption_device_uuid:
             self.logger.debug(u'Adding new power consumption device')
             device = self._add_device(power_consumption_default_device)
-            if not device:
+            if not device: # pragma: no cover
                 raise Exception(u'Unable to add new device')
             self.power_consumption_device_uuid = device[u'uuid']
 
         self.logger.debug(u'Found instant power device "%s"' % self.instant_power_device_uuid)
         self.logger.debug(u'Found power consumption device "%s"' % self.power_consumption_device_uuid)
 
-    def __configure_hardware(self):
+    def _configure_hardware(self):
         """
         Configure hardware
         Search device (device path) and initialize parser
@@ -143,10 +144,11 @@ class Teleinfo(RaspIotModule):
             bool: True if hardware configured successfully, False otherwise
         """
         #scan dongle port
+        self.logger.trace(u'Scanning "%s" for devices' % self.USB_PATH)
         devices = [path for path in [f for f in glob.glob(self.USB_PATH + u'*')] if path.find(u'TINFO')>0]
         self.logger.debug('Found devices: %s' % devices)
         if len(devices)==0:
-            self.logger.warn(u'No device found, teleinfo disabled')
+            self.logger.warn(u'No Teleinfo hardware found, teleinfo disabled')
             return False
 
         #get only one device
@@ -160,7 +162,7 @@ class Teleinfo(RaspIotModule):
             return True
 
         except:
-            self.logger.exception(u'Fatal error initializing teleinfo parser. Are you using µTeleinf dongle?')
+            self.logger.exception(u'Fatal error initializing teleinfo parser. Are you using MicroTeleinfo dongle?')
             return False
 
     def _stop(self):
@@ -183,6 +185,7 @@ class Teleinfo(RaspIotModule):
         """
         if self.teleinfo_task is not None:
             self.teleinfo_task.stop()
+            self.teleinfo_task = None
 
     def _restart_teleinfo_task(self):
         """
@@ -246,28 +249,41 @@ class Teleinfo(RaspIotModule):
             if set([u'HCHC', u'HCHP']).issubset(keys):
                 #handle heures creuses/pleines
                 self.logger.trace(u'Handle heures creuses/pleines')
-                self.__last_conso_heures_creuses = int(self.last_raw[u'HCHC'])
-                self.__last_conso_heures_pleines = int(self.last_raw[u'HCHP'])
+                ints = self.to_int(self.last_raw, [u'HCHC', u'HCHP'])
+                if ints:
+                    self.__last_conso_heures_creuses = ints[u'HCHC']
+                    self.__last_conso_heures_pleines = ints[u'HCHP']
             elif set([u'EJPHN', u'EJPHPM']).issubset(keys):
                 #handle EJP
                 self.logger.trace(u'Handle EJP')
-                self.__last_conso_heures_creuses = int(self.last_raw[u'EJPHN'])
-                self.__last_conso_heures_pleines = int(self.last_raw[u'EJPHPM'])
+                ints = self.to_int(self.last_raw, [u'EJPHN', u'EJPHPM'])
+                if ints:
+                    self.__last_conso_heures_creuses = ints[u'EJPHN']
+                    self.__last_conso_heures_pleines = ints[u'EJPHPM']
             elif set([u'BBRHCJB', u'BBRHPJB', u'BBRHCJW', u'BBRHPJW', u'BBRHCJR', u'BBRHPJR']).issubset(keys):
                 #handle Tempo
                 self.logger.trace(u'Handle Tempo')
-                self.__last_conso_heures_creuses = int(self.last_raw[u'BBRHCJB']) + int(self.last_raw[u'BBRHCJW']) + int(self.last_raw[u'BBRHCJR'])
-                self.__last_conso_heures_pleines = int(self.last_raw[u'BBRHPJB']) + int(self.last_raw[u'BBRHPJW']) + int(self.last_raw[u'BBRHPJR'])
+                ints = self.to_int(self.last_raw, [u'BBRHCJB', u'BBRHPJB', u'BBRHCJW', u'BBRHPJW', u'BBRHCJR', u'BBRHPJR'])
+                if ints:
+                    self.__last_conso_heures_creuses = ints[u'BBRHCJB'] + ints[u'BBRHCJW'] + ints[u'BBRHCJR']
+                    self.__last_conso_heures_pleines = ints[u'BBRHPJB'] + ints[u'BBRHPJW'] + ints[u'BBRHPJR']
             elif set([u'BASE']).issubset(keys):
                 #handle Base
                 self.logger.trace(u'Handle Base')
-                self.__last_conso_heures_creuses = int(self.last_raw[u'BASE'])
-                self.__last_conso_heures_pleines = 0
+                ints = self.to_int(self.last_raw, [u'BASE'])
+                if ints:
+                    self.__last_conso_heures_creuses = ints[u'BASE']
+                    self.__last_conso_heures_pleines = 0
             else:
                 self.logger.debug(u'No consumption value in raw data %s' % self.last_raw)
 
             #instant power
             if set([u'IINST']).issubset(keys):
+                ints = self.to_int(self.last_raw, [u'IINST'])
+            elif set([u'IINST1', u'IINST2', u'IINST3']).issubset(keys):
+                ints = self.to_int(self.last_raw, [u'IINST1', u'IINST2', u'IINST3'])
+                ints[u'IINST'] = ints[u'IINST1'] + ints[u'IINST2'] + ints[u'IINST3']
+            if ints:
                 #handle next mode
                 next_mode = None
                 if set([u'DEMAIN']).issubset(keys):
@@ -277,7 +293,7 @@ class Teleinfo(RaspIotModule):
 
                 params = {
                     u'lastupdate': int(time.time()),
-                    u'power': int(self.last_raw[u'IINST']) * self.VA_FACTOR,
+                    u'power': ints[u'IINST'] * self.VA_FACTOR,
                     u'currentmode': self.last_raw[u'PTEC'] if u'PTEC' in self.last_raw else None,
                     u'nextmode': next_mode,
                     u'heurescreuses': self.__last_conso_heures_creuses,
@@ -289,10 +305,8 @@ class Teleinfo(RaspIotModule):
                 self.logger.trace(u'Send power update event with params: %s' % params)
                 self._update_device(self.instant_power_device_uuid, params)
                 self.power_update_event.send(params=params, device_id=self.instant_power_device_uuid)
-            else:
-                self.logger.debug(u'No intensity value in raw data %s' % self.last_raw)
 
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             self.logger.exception(u'Exception during teleinfo task:')
 
     def _get_teleinfo_raw_data(self):
@@ -302,6 +316,7 @@ class Teleinfo(RaspIotModule):
         Returns:
             dict: raw teleinfo data or empty if no dongle connected
         """
+        self.logger.debug('PARSER= %s' % self.__teleinfo_parser)
         if self.__teleinfo_parser:
             return self.__teleinfo_parser.get_frame()
 
@@ -324,4 +339,23 @@ class Teleinfo(RaspIotModule):
 
         """
         return [{'key':k, 'value':v} for k,v in self.last_raw.iteritems()]
+
+    def to_int(self, raw, keys):
+        """
+        Convert all values from raw to integer
+        This function is useful to check values are valid
+
+        Args:
+            raw (dict): raw data from teleinfo
+            keys (list): list of keys available in raw to convert
+        Returns:
+            dict: dict of key-int or None if error occured
+        """
+        try:
+            out = {}
+            for key in keys:
+                out[key] = int(raw[key])
+            return out
+        except: # pragma: no cover
+            return None
 
