@@ -33,7 +33,7 @@ class TestTeleinfoConfigureHardware(unittest.TestCase):
 
     def setUp(self):
         self.session = session.TestSession(logging.CRITICAL)
-        logging.basicConfig(level=logging.DEBUG, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
         teleinfo.Parser = Mock(return_value=MockedParser(self.DATA))
         teleinfo.UTInfo2 = Mock()
@@ -128,7 +128,7 @@ class TestTeleinfoConfigureDevices(unittest.TestCase):
 
     def setUp(self):
         self.session = session.TestSession(logging.CRITICAL)
-        logging.basicConfig(level=logging.DEBUG, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
         teleinfo.Parser = Mock()
         teleinfo.UTInfo2 = Mock()
@@ -182,7 +182,7 @@ class TestTeleinfo(unittest.TestCase):
 
     def setUp(self):
         self.session = session.TestSession(logging.CRITICAL)
-        logging.basicConfig(level=logging.DEBUG, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
         teleinfo.UTInfo2 = Mock()
         teleinfo.Parser = Mock(return_value=MockedParser(self.DATA))
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
@@ -248,7 +248,7 @@ class TestTeleinfoHistoBase(unittest.TestCase):
 
     def setUp(self):
         self.session = session.TestSession(logging.CRITICAL)
-        logging.basicConfig(level=logging.DEBUG, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
         teleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
         teleinfo.Parser = Mock(return_value=self.mocked_parser)
@@ -303,7 +303,7 @@ class TestTeleinfoHistoHCHP(unittest.TestCase):
 
     def setUp(self):
         self.session = session.TestSession(logging.CRITICAL)
-        logging.basicConfig(level=logging.DEBUG, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
         teleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
         teleinfo.Parser = Mock(return_value=self.mocked_parser)
@@ -394,7 +394,7 @@ class TestTeleinfoHistoEJP(unittest.TestCase):
 
     def setUp(self):
         self.session = session.TestSession(logging.CRITICAL)
-        logging.basicConfig(level=logging.DEBUG, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
         teleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
         teleinfo.Parser = Mock(return_value=self.mocked_parser)
@@ -454,7 +454,7 @@ class TestTeleinfoHistoTempo(unittest.TestCase):
 
     def setUp(self):
         self.session = session.TestSession(logging.CRITICAL)
-        logging.basicConfig(level=logging.DEBUG, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
         teleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
         teleinfo.Parser = Mock(return_value=self.mocked_parser)
@@ -514,7 +514,7 @@ class TestTeleinfoHistoEJPTriphase(unittest.TestCase):
 
     def setUp(self):
         self.session = session.TestSession(logging.CRITICAL)
-        logging.basicConfig(level=logging.DEBUG, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
         teleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
         teleinfo.Parser = Mock(return_value=self.mocked_parser)
