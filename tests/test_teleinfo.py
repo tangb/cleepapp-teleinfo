@@ -3,7 +3,7 @@ import logging
 import sys
 sys.path.append('../')
 from backend import teleinfo
-from raspiot.utils import InvalidParameter, MissingParameter, CommandError, Unauthorized
+from raspiot.exception import InvalidParameter, MissingParameter, CommandError, Unauthorized
 from raspiot.libs.tests import session
 import os, io
 import time
@@ -32,8 +32,9 @@ class TestTeleinfoConfigureHardware(unittest.TestCase):
     }
 
     def setUp(self):
-        self.session = session.TestSession(logging.CRITICAL)
-        logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        logging.basicConfig(level=logging.FATAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        self.session = session.TestSession()
+
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
         teleinfo.Parser = Mock(return_value=MockedParser(self.DATA))
         teleinfo.UTInfo2 = Mock()
@@ -108,7 +109,8 @@ class TestTeleinfoConfigureHardware(unittest.TestCase):
 
             self.module._teleinfo_task()
             logging.debug('RAW=%s' % self.module.last_raw)
-            self.assertEqual(len(self.module.last_raw), 0)
+            # should return last valid raw data (read during startup)
+            self.assertEqual(self.module.last_raw, self.DATA)
 
         finally:
             if os.path.exists(self.path):
@@ -127,8 +129,9 @@ class TestTeleinfoConfigureHardware(unittest.TestCase):
 class TestTeleinfoConfigureDevices(unittest.TestCase):
 
     def setUp(self):
-        self.session = session.TestSession(logging.CRITICAL)
         logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        self.session = session.TestSession()
+
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
         teleinfo.Parser = Mock()
         teleinfo.UTInfo2 = Mock()
@@ -181,8 +184,9 @@ class TestTeleinfo(unittest.TestCase):
     }
 
     def setUp(self):
-        self.session = session.TestSession(logging.CRITICAL)
         logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        self.session = session.TestSession()
+
         teleinfo.UTInfo2 = Mock()
         teleinfo.Parser = Mock(return_value=MockedParser(self.DATA))
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
@@ -247,8 +251,9 @@ class TestTeleinfoHistoBase(unittest.TestCase):
     }
 
     def setUp(self):
-        self.session = session.TestSession(logging.CRITICAL)
         logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        self.session = session.TestSession()
+
         teleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
         teleinfo.Parser = Mock(return_value=self.mocked_parser)
@@ -302,8 +307,9 @@ class TestTeleinfoHistoHCHP(unittest.TestCase):
     }
 
     def setUp(self):
-        self.session = session.TestSession(logging.CRITICAL)
         logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        self.session = session.TestSession()
+
         teleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
         teleinfo.Parser = Mock(return_value=self.mocked_parser)
@@ -393,8 +399,9 @@ class TestTeleinfoHistoEJP(unittest.TestCase):
     }
 
     def setUp(self):
-        self.session = session.TestSession(logging.CRITICAL)
         logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        self.session = session.TestSession()
+
         teleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
         teleinfo.Parser = Mock(return_value=self.mocked_parser)
@@ -453,8 +460,9 @@ class TestTeleinfoHistoTempo(unittest.TestCase):
     }
 
     def setUp(self):
-        self.session = session.TestSession(logging.CRITICAL)
         logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        self.session = session.TestSession()
+
         teleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
         teleinfo.Parser = Mock(return_value=self.mocked_parser)
@@ -513,8 +521,9 @@ class TestTeleinfoHistoEJPTriphase(unittest.TestCase):
     }
 
     def setUp(self):
-        self.session = session.TestSession(logging.CRITICAL)
         logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        self.session = session.TestSession()
+
         teleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
         teleinfo.Parser = Mock(return_value=self.mocked_parser)

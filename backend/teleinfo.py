@@ -6,10 +6,10 @@
 from __future__ import absolute_import
 import logging
 import time
-from raspiot.utils import CommandError, MissingParameter, InvalidParameter
+from raspiot.exception import CommandError, MissingParameter, InvalidParameter
 from raspiot.libs.internals.task import Task
-from raspiot.raspiot import RaspIotModule
-from raspiot.utils import CATEGORIES
+from raspiot.core import RaspIotModule
+from raspiot.common import CATEGORIES
 import glob
 from teleinfo import Parser
 from teleinfo.hw_vendors import UTInfo2
@@ -86,6 +86,7 @@ class Teleinfo(RaspIotModule):
         #configure hardware
         if self._configure_hardware():
             #update values at startup
+            self.logger.debug(u'Update data at startup')
             self._teleinfo_task()
 
         #start teleinfo task
@@ -237,74 +238,83 @@ class Teleinfo(RaspIotModule):
             self.logger.trace(u'Update teleinfo')
 
             #read teleinfo data
-            self.last_raw = self._get_teleinfo_raw_data()
-            self.logger.debug(u'Raw teleinfo: %s' % self.last_raw)
+            raw = self._get_teleinfo_raw_data()
+            self.logger.debug(u'Raw teleinfo: %s' % raw)
 
             #compute some values
-            if not self.last_raw:
+            if not raw:
                 return
 
-            keys = set(self.last_raw.keys())
+            # save as soon as possible some data
+            if not self.last_raw:
+                self.last_raw = raw
+
+            keys = set(raw.keys())
             #power consumption
             if set([u'HCHC', u'HCHP']).issubset(keys):
                 #handle heures creuses/pleines
                 self.logger.trace(u'Handle heures creuses/pleines')
-                ints = self.to_int(self.last_raw, [u'HCHC', u'HCHP'])
+                ints = self.to_int(raw, [u'HCHC', u'HCHP'])
                 if ints:
                     self.__last_conso_heures_creuses = ints[u'HCHC']
                     self.__last_conso_heures_pleines = ints[u'HCHP']
             elif set([u'EJPHN', u'EJPHPM']).issubset(keys):
                 #handle EJP
                 self.logger.trace(u'Handle EJP')
-                ints = self.to_int(self.last_raw, [u'EJPHN', u'EJPHPM'])
+                ints = self.to_int(raw, [u'EJPHN', u'EJPHPM'])
                 if ints:
                     self.__last_conso_heures_creuses = ints[u'EJPHN']
                     self.__last_conso_heures_pleines = ints[u'EJPHPM']
             elif set([u'BBRHCJB', u'BBRHPJB', u'BBRHCJW', u'BBRHPJW', u'BBRHCJR', u'BBRHPJR']).issubset(keys):
                 #handle Tempo
                 self.logger.trace(u'Handle Tempo')
-                ints = self.to_int(self.last_raw, [u'BBRHCJB', u'BBRHPJB', u'BBRHCJW', u'BBRHPJW', u'BBRHCJR', u'BBRHPJR'])
+                ints = self.to_int(raw, [u'BBRHCJB', u'BBRHPJB', u'BBRHCJW', u'BBRHPJW', u'BBRHCJR', u'BBRHPJR'])
                 if ints:
                     self.__last_conso_heures_creuses = ints[u'BBRHCJB'] + ints[u'BBRHCJW'] + ints[u'BBRHCJR']
                     self.__last_conso_heures_pleines = ints[u'BBRHPJB'] + ints[u'BBRHPJW'] + ints[u'BBRHPJR']
             elif set([u'BASE']).issubset(keys):
                 #handle Base
                 self.logger.trace(u'Handle Base')
-                ints = self.to_int(self.last_raw, [u'BASE'])
+                ints = self.to_int(raw, [u'BASE'])
                 if ints:
                     self.__last_conso_heures_creuses = ints[u'BASE']
                     self.__last_conso_heures_pleines = 0
             else:
-                self.logger.debug(u'No consumption value in raw data %s' % self.last_raw)
+                self.logger.debug(u'No consumption value in raw data %s' % raw)
 
             #instant power
             if set([u'IINST']).issubset(keys):
-                ints = self.to_int(self.last_raw, [u'IINST'])
+                ints = self.to_int(raw, [u'IINST'])
             elif set([u'IINST1', u'IINST2', u'IINST3']).issubset(keys):
-                ints = self.to_int(self.last_raw, [u'IINST1', u'IINST2', u'IINST3'])
+                ints = self.to_int(raw, [u'IINST1', u'IINST2', u'IINST3'])
                 ints[u'IINST'] = ints[u'IINST1'] + ints[u'IINST2'] + ints[u'IINST3']
+            else:
+                ints = None
             if ints:
                 #handle next mode
                 next_mode = None
                 if set([u'DEMAIN']).issubset(keys):
-                    next_mode = self.last_raw[u'DEMAIN']
+                    next_mode = raw[u'DEMAIN']
                 elif set([u'PEJP']).issubset(keys):
-                    next_mode = u'EJP in %s mins' % self.last_raw[u'PEJP']
+                    next_mode = u'EJP in %s mins' % raw[u'PEJP']
 
                 params = {
                     u'lastupdate': int(time.time()),
                     u'power': ints[u'IINST'] * self.VA_FACTOR,
-                    u'currentmode': self.last_raw[u'PTEC'] if u'PTEC' in self.last_raw else None,
+                    u'currentmode': raw[u'PTEC'] if u'PTEC' in raw else None,
                     u'nextmode': next_mode,
                     u'heurescreuses': self.__last_conso_heures_creuses,
                     u'heurespleines': self.__last_conso_heures_pleines,
-                    u'subscription': self.last_raw[u'ISOUSC'] if u'ISOUSC' in self.last_raw else None,
+                    u'subscription': raw[u'ISOUSC'] if u'ISOUSC' in raw else None,
                 }
                     
                 #and emit events
                 self.logger.trace(u'Send power update event with params: %s' % params)
                 self._update_device(self.instant_power_device_uuid, params)
                 self.power_update_event.send(params=params, device_id=self.instant_power_device_uuid)
+
+            # save last raw
+            self.last_raw = raw
 
         except Exception as e: # pragma: no cover
             self.logger.exception(u'Exception during teleinfo task:')
@@ -316,7 +326,7 @@ class Teleinfo(RaspIotModule):
         Returns:
             dict: raw teleinfo data or empty if no dongle connected
         """
-        self.logger.debug('PARSER= %s' % self.__teleinfo_parser)
+        self.logger.trace('Parser= %s' % self.__teleinfo_parser)
         if self.__teleinfo_parser:
             return self.__teleinfo_parser.get_frame()
 
