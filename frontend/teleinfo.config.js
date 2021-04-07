@@ -2,10 +2,12 @@
  * Teleinfo config directive
  * Handle teleinfo module configuration
  */
-var teleinfoConfigDirective = function(teleinfoService, raspiotService) {
+angular
+.module('Cleep')
+.directive('teleinfoConfigComponent', ['teleinfoService', 'cleepService',
+function(teleinfoService, cleepService) {
 
-    var teleinfoController = function()
-    {
+    var teleinfoController = function() {
         var self = this;
         self.tabIndex = 'teleinfo';
         self.port = '';
@@ -39,9 +41,9 @@ var teleinfoConfigDirective = function(teleinfoService, raspiotService) {
         /**
          * Init controller
          */
-        self.init = function()
-        {
-            raspiotService.getModuleConfig('teleinfo')
+        self.$onInit = function() {
+            console.log('init teleingfo')
+            cleepService.getModuleConfig('teleinfo')
                 .then(function(config) {
                     self.port = config.port
                     if( !self.port ) {
@@ -74,20 +76,12 @@ var teleinfoConfigDirective = function(teleinfoService, raspiotService) {
 
     };
 
-    var teleinfoLink = function(scope, element, attrs, controller) {
-        controller.init();
-    };
-
     return {
         templateUrl: 'teleinfo.config.html',
         replace: true,
         scope: true,
         controller: teleinfoController,
         controllerAs: 'teleinfoCtl',
-        link: teleinfoLink
     };
-};
-
-var RaspIot = angular.module('RaspIot');
-RaspIot.directive('teleinfoConfigDirective', ['teleinfoService', 'raspiotService', teleinfoConfigDirective])
+}]);
 

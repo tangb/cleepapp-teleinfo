@@ -1,4 +1,4 @@
 #!/bin/sh
 
-/usr/local/bin/pip2 uninstall --yes "teleinfo"
+python3 -m pip uninstall --yes "teleinfo"
 

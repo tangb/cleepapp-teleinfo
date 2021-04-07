@@ -2,7 +2,10 @@
  * Teleinfo service
  * Handle teleinfo module requests
  */
-var teleinfoService = function($rootScope, rpcService, raspiotService) {
+angular
+.module('Cleep')
+.service('teleinfoService', ['$rootScope', 'rpcService', 'cleepService',
+function($rootScope, rpcService, cleepService) {
     var self = this;
     
     /**
@@ -16,22 +19,19 @@ var teleinfoService = function($rootScope, rpcService, raspiotService) {
      * Catch power update event
      */
     $rootScope.$on('teleinfo.power.update', function(event, uuid, params) {
-        for( var i=0; i<raspiotService.devices.length; i++ ) {   
-            if( raspiotService.devices[i].uuid===uuid ) {
-                raspiotService.devices[i].lastupdate = params.lastupdate;
-                raspiotService.devices[i].power = params.power;
-                raspiotService.devices[i].currentmode = params.currentmode;
-                raspiotService.devices[i].nextmode = params.nextmode;
-                raspiotService.devices[i].heurescreuses = params.heurescreuses;
-                raspiotService.devices[i].heurespleines = params.heurespleines;
-                raspiotService.devices[i].subscription = params.subscription;
+        for( var i=0; i<cleepService.devices.length; i++ ) {   
+            if( cleepService.devices[i].uuid===uuid ) {
+                cleepService.devices[i].lastupdate = params.lastupdate;
+                cleepService.devices[i].power = params.power;
+                cleepService.devices[i].currentmode = params.currentmode;
+                cleepService.devices[i].nextmode = params.nextmode;
+                cleepService.devices[i].heurescreuses = params.heurescreuses;
+                cleepService.devices[i].heurespleines = params.heurespleines;
+                cleepService.devices[i].subscription = params.subscription;
                 break;
             }   
         }   
     });
 
-};
-    
-var RaspIot = angular.module('RaspIot');
-RaspIot.service('teleinfoService', ['$rootScope', 'rpcService', 'raspiotService', teleinfoService]);
+}]);
 

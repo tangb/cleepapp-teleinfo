@@ -2,9 +2,9 @@ import unittest
 import logging
 import sys
 sys.path.append('../')
-from backend import teleinfo
-from raspiot.exception import InvalidParameter, MissingParameter, CommandError, Unauthorized
-from raspiot.libs.tests import session
+from backend import cteleinfo
+from cleep.exception import InvalidParameter, MissingParameter, CommandError, Unauthorized
+from cleep.libs.tests import session
 import os, io
 import time
 from mock import Mock
@@ -33,21 +33,22 @@ class TestTeleinfoConfigureHardware(unittest.TestCase):
 
     def setUp(self):
         logging.basicConfig(level=logging.FATAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
-        self.session = session.TestSession()
+        self.session = session.TestSession(self)
 
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
-        teleinfo.Parser = Mock(return_value=MockedParser(self.DATA))
-        teleinfo.UTInfo2 = Mock()
+        cteleinfo.Parser = Mock(return_value=MockedParser(self.DATA))
+        cteleinfo.UTInfo2 = Mock()
 
     def tearDown(self):
         self.session.clean()
 
     def init(self, mock_teleinfo_task=Mock()):
-        Teleinfo_ = self.session.clone_class(teleinfo.Teleinfo)
+        Teleinfo_ = self.session.clone_class(cteleinfo.Cteleinfo)
         Teleinfo_.USB_PATH = os.path.abspath('./') + '/'
         if mock_teleinfo_task:
             Teleinfo_._teleinfo_task = mock_teleinfo_task
         self.module = self.session.setup(Teleinfo_)
+        self.session.start_module(self.module)
 
     def test_configure_hardware_dongle_found(self):
         try:
@@ -73,7 +74,7 @@ class TestTeleinfoConfigureHardware(unittest.TestCase):
         try:
             with io.open(self.path, 'w') as f:
                 f.write(u'')
-            teleinfo.Parser.side_effect = Exception('test')
+            cteleinfo.Parser.side_effect = Exception('test')
             self.init()
 
             self.assertFalse(self.module._configure_hardware())
@@ -83,7 +84,7 @@ class TestTeleinfoConfigureHardware(unittest.TestCase):
                 os.remove(self.path)
 
     def test_teleinfo_task_with_dongle(self):
-        #execute test here because dongle is needed
+        # execute test here because dongle is needed
         try:
             with io.open(self.path, 'w') as f:
                 f.write(u'')
@@ -92,7 +93,7 @@ class TestTeleinfoConfigureHardware(unittest.TestCase):
             self.module._teleinfo_task()
             logging.debug('RAW=%s' % self.module.last_raw)
             self.assertEqual(len(self.module.last_raw), len(self.DATA))
-            self.assertEqual(self.module.last_raw.keys()[0], self.DATA.keys()[0])
+            self.assertEqual(list(self.module.last_raw.keys())[0], list(self.DATA.keys())[0])
 
         finally:
             if os.path.exists(self.path):
@@ -104,7 +105,7 @@ class TestTeleinfoConfigureHardware(unittest.TestCase):
                 f.write(u'')
             self.init(None)
 
-            #mock
+            # mock
             self.module._get_teleinfo_raw_data = Mock(return_value={})
 
             self.module._teleinfo_task()
@@ -129,40 +130,42 @@ class TestTeleinfoConfigureHardware(unittest.TestCase):
 class TestTeleinfoConfigureDevices(unittest.TestCase):
 
     def setUp(self):
-        logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
-        self.session = session.TestSession()
+        logging.basicConfig(level=logging.DEBUG, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        self.session = session.TestSession(self)
 
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
-        teleinfo.Parser = Mock()
-        teleinfo.UTInfo2 = Mock()
+        cteleinfo.Parser = Mock()
+        cteleinfo.UTInfo2 = Mock()
 
     def tearDown(self):
         self.session.clean()
 
     def init(self):
-        Teleinfo_ = self.session.clone_class(teleinfo.Teleinfo)
+        Teleinfo_ = self.session.clone_class(cteleinfo.Cteleinfo)
         Teleinfo_.USB_PATH = os.path.abspath('./') + '/'
         Teleinfo_._teleinfo_task = Mock()
         self.module = self.session.setup(Teleinfo_)
+        self.session.start_module(self.module)
 
+    """
     def test_configure_devices_with_existing_config(self):
-        #create Teleinfo instance to create config file
+        # create Teleinfo instance to create config file
         self.init()
         
-        #get devices
+        # get devices
         old_devices = self.module._get_devices()
         logging.debug('Old devices: %s' % old_devices)
 
-        #then create new Teleinfo instance to use existing devices
+        # then create new Teleinfo instance to use existing devices
         module = self.session.respawn_module()
         devices = module._get_devices()
         logging.debug('Devices: %s' % devices)
 
-        #check if devices uuid are the same
+        # check if devices uuid are the same
         self.assertEqual(len(old_devices), len(devices), 'Number of devices should be the same')
         for device_uuid in old_devices:
             self.assertTrue(device_uuid in devices, 'Device should be correctly reloaded')
-       
+    """
 
 
 
@@ -185,17 +188,18 @@ class TestTeleinfo(unittest.TestCase):
 
     def setUp(self):
         logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
-        self.session = session.TestSession()
+        self.session = session.TestSession(self)
 
-        teleinfo.UTInfo2 = Mock()
-        teleinfo.Parser = Mock(return_value=MockedParser(self.DATA))
+        cteleinfo.UTInfo2 = Mock()
+        cteleinfo.Parser = Mock(return_value=MockedParser(self.DATA))
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
         with io.open(self.path, 'w') as f:
             f.write(u'')
-        Teleinfo_ = self.session.clone_class(teleinfo.Teleinfo)
+        Teleinfo_ = self.session.clone_class(cteleinfo.Cteleinfo)
         Teleinfo_.USB_PATH = os.path.abspath('./') + '/'
         Teleinfo_._teleinfo_task = Mock()
         self.module = self.session.setup(Teleinfo_)
+        self.session.start_module(self.module)
 
     def tearDown(self):
         self.session.clean()
@@ -226,7 +230,7 @@ class TestTeleinfo(unittest.TestCase):
         raw = self.module._get_teleinfo_raw_data()
         logging.debug('RAW=%s' % raw)
         self.assertEqual(len(raw), len(self.DATA))
-        for key,value in raw.iteritems():
+        for key,value in raw.items():
             self.assertTrue(key in self.DATA)
             self.assertEqual(value, self.DATA[key])
 
@@ -252,11 +256,11 @@ class TestTeleinfoHistoBase(unittest.TestCase):
 
     def setUp(self):
         logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
-        self.session = session.TestSession()
+        self.session = session.TestSession(self)
 
-        teleinfo.UTInfo2 = Mock()
+        cteleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
-        teleinfo.Parser = Mock(return_value=self.mocked_parser)
+        cteleinfo.Parser = Mock(return_value=self.mocked_parser)
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
         with io.open(self.path, 'w') as f:
             f.write(u'')
@@ -267,18 +271,19 @@ class TestTeleinfoHistoBase(unittest.TestCase):
             os.remove(self.path)
 
     def init(self):
-        Teleinfo_ = self.session.clone_class(teleinfo.Teleinfo)
+        Teleinfo_ = self.session.clone_class(cteleinfo.Cteleinfo)
         Teleinfo_.USB_PATH = os.path.abspath('./') + '/'
         self.module = self.session.setup(Teleinfo_)
+        self.session.start_module(self.module)
 
     def test_teleinfo_task(self):
         self.init()
         self.mocked_parser.set_get_frame_output(self.TI_HISTO_BASE)
         self.module._teleinfo_task()
         
-        self.assertEqual(self.session.get_event_calls('teleinfo.power.update'), 1)
-        self.assertEqual(self.session.get_event_calls('teleinfo.consumption.update'), 0)
-        event_params = self.session.get_event_last_params('teleinfo.power.update')
+        self.assertEqual(self.session.event_call_count('teleinfo.power.update'), 1)
+        self.assertEqual(self.session.event_call_count('teleinfo.consumption.update'), 0)
+        event_params = self.session.get_last_event_params('teleinfo.power.update')
         logging.debug('Event params: %s' % event_params)
         self.assertEqual(event_params['power'], int(self.TI_HISTO_BASE['IINST']) * self.module.VA_FACTOR)
         self.assertEqual(event_params['currentmode'], self.TI_HISTO_BASE['PTEC'])
@@ -308,11 +313,11 @@ class TestTeleinfoHistoHCHP(unittest.TestCase):
 
     def setUp(self):
         logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
-        self.session = session.TestSession()
+        self.session = session.TestSession(self)
 
-        teleinfo.UTInfo2 = Mock()
+        cteleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
-        teleinfo.Parser = Mock(return_value=self.mocked_parser)
+        cteleinfo.Parser = Mock(return_value=self.mocked_parser)
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
         with io.open(self.path, 'w') as f:
             f.write(u'')
@@ -323,18 +328,19 @@ class TestTeleinfoHistoHCHP(unittest.TestCase):
             os.remove(self.path)
 
     def init(self):
-        Teleinfo_ = self.session.clone_class(teleinfo.Teleinfo)
+        Teleinfo_ = self.session.clone_class(cteleinfo.Cteleinfo)
         Teleinfo_.USB_PATH = os.path.abspath('./') + '/'
         self.module = self.session.setup(Teleinfo_)
+        self.session.start_module(self.module)
 
     def test_teleinfo_task(self):
         self.init()
         self.mocked_parser.set_get_frame_output(self.TI_HISTO_HCHP)
         self.module._teleinfo_task()
         
-        self.assertEqual(self.session.get_event_calls('teleinfo.power.update'), 1)
-        self.assertEqual(self.session.get_event_calls('teleinfo.consumption.update'), 0)
-        event_params = self.session.get_event_last_params('teleinfo.power.update')
+        self.assertEqual(self.session.event_call_count('teleinfo.power.update'), 1)
+        self.assertEqual(self.session.event_call_count('teleinfo.consumption.update'), 0)
+        event_params = self.session.get_last_event_params('teleinfo.power.update')
         logging.debug('Event params: %s' % event_params)
         self.assertEqual(event_params['power'], int(self.TI_HISTO_HCHP['IINST']) * self.module.VA_FACTOR)
         self.assertEqual(event_params['currentmode'], self.TI_HISTO_HCHP['PTEC'])
@@ -356,11 +362,11 @@ class TestTeleinfoHistoHCHP(unittest.TestCase):
         self.module._teleinfo_task()
         
         self.module.event_received(event)
-        self.assertEqual(self.session.get_event_calls('teleinfo.consumption.update'), 0)
+        self.assertEqual(self.session.event_call_count('teleinfo.consumption.update'), 0)
 
         self.module.event_received(event)
-        self.assertEqual(self.session.get_event_calls('teleinfo.consumption.update'), 1)
-        event_params = self.session.get_event_last_params('teleinfo.consumption.update')
+        self.assertEqual(self.session.event_call_count('teleinfo.consumption.update'), 1)
+        event_params = self.session.get_last_event_params('teleinfo.consumption.update')
         logging.debug('Event params: %s' % event_params)
         # should be equal to 0 because no consumption between 2 measures
         self.assertEqual(event_params['heurescreuses'], 0)
@@ -373,8 +379,8 @@ class TestTeleinfoHistoHCHP(unittest.TestCase):
             'previousconsoheurespleines': int(self.TI_HISTO_HCHP['HCHP']) - 999,
         })
         self.module.event_received(event)
-        self.assertEqual(self.session.get_event_calls('teleinfo.consumption.update'), 2)
-        event_params = self.session.get_event_last_params('teleinfo.consumption.update')
+        self.assertEqual(self.session.event_call_count('teleinfo.consumption.update'), 2)
+        event_params = self.session.get_last_event_params('teleinfo.consumption.update')
         logging.debug('Event params: %s' % event_params)
         self.assertEqual(event_params['heurescreuses'], 666)
         self.assertEqual(event_params['heurespleines'], 999)
@@ -400,11 +406,11 @@ class TestTeleinfoHistoEJP(unittest.TestCase):
 
     def setUp(self):
         logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
-        self.session = session.TestSession()
+        self.session = session.TestSession(self)
 
-        teleinfo.UTInfo2 = Mock()
+        cteleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
-        teleinfo.Parser = Mock(return_value=self.mocked_parser)
+        cteleinfo.Parser = Mock(return_value=self.mocked_parser)
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
         with io.open(self.path, 'w') as f:
             f.write(u'')
@@ -415,18 +421,19 @@ class TestTeleinfoHistoEJP(unittest.TestCase):
             os.remove(self.path)
 
     def init(self):
-        Teleinfo_ = self.session.clone_class(teleinfo.Teleinfo)
+        Teleinfo_ = self.session.clone_class(cteleinfo.Cteleinfo)
         Teleinfo_.USB_PATH = os.path.abspath('./') + '/'
         self.module = self.session.setup(Teleinfo_)
+        self.session.start_module(self.module)
 
     def test_teleinfo_task(self):
         self.init()
         self.mocked_parser.set_get_frame_output(self.TI_HISTO_EJP)
         self.module._teleinfo_task()
         
-        self.assertEqual(self.session.get_event_calls('teleinfo.power.update'), 1)
-        self.assertEqual(self.session.get_event_calls('teleinfo.consumption.update'), 0)
-        event_params = self.session.get_event_last_params('teleinfo.power.update')
+        self.assertEqual(self.session.event_call_count('teleinfo.power.update'), 1)
+        self.assertEqual(self.session.event_call_count('teleinfo.consumption.update'), 0)
+        event_params = self.session.get_last_event_params('teleinfo.power.update')
         logging.debug('Event params: %s' % event_params)
         self.assertEqual(event_params['power'], int(self.TI_HISTO_EJP['IINST']) * self.module.VA_FACTOR)
         self.assertEqual(event_params['currentmode'], self.TI_HISTO_EJP['PTEC'])
@@ -461,11 +468,11 @@ class TestTeleinfoHistoTempo(unittest.TestCase):
 
     def setUp(self):
         logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
-        self.session = session.TestSession()
+        self.session = session.TestSession(self)
 
-        teleinfo.UTInfo2 = Mock()
+        cteleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
-        teleinfo.Parser = Mock(return_value=self.mocked_parser)
+        cteleinfo.Parser = Mock(return_value=self.mocked_parser)
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
         with io.open(self.path, 'w') as f:
             f.write(u'')
@@ -476,18 +483,19 @@ class TestTeleinfoHistoTempo(unittest.TestCase):
             os.remove(self.path)
 
     def init(self):
-        Teleinfo_ = self.session.clone_class(teleinfo.Teleinfo)
+        Teleinfo_ = self.session.clone_class(cteleinfo.Cteleinfo)
         Teleinfo_.USB_PATH = os.path.abspath('./') + '/'
         self.module = self.session.setup(Teleinfo_)
+        self.session.start_module(self.module)
 
     def test_teleinfo_task(self):
         self.init()
         self.mocked_parser.set_get_frame_output(self.TI_HISTO_TEMPO)
         self.module._teleinfo_task()
         
-        self.assertEqual(self.session.get_event_calls('teleinfo.power.update'), 1)
-        self.assertEqual(self.session.get_event_calls('teleinfo.consumption.update'), 0)
-        event_params = self.session.get_event_last_params('teleinfo.power.update')
+        self.assertEqual(self.session.event_call_count('teleinfo.power.update'), 1)
+        self.assertEqual(self.session.event_call_count('teleinfo.consumption.update'), 0)
+        event_params = self.session.get_last_event_params('teleinfo.power.update')
         logging.debug('Event params: %s' % event_params)
         self.assertEqual(event_params['power'], int(self.TI_HISTO_TEMPO['IINST']) * self.module.VA_FACTOR)
         self.assertEqual(event_params['currentmode'], self.TI_HISTO_TEMPO['PTEC'])
@@ -522,11 +530,11 @@ class TestTeleinfoHistoEJPTriphase(unittest.TestCase):
 
     def setUp(self):
         logging.basicConfig(level=logging.CRITICAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
-        self.session = session.TestSession()
+        self.session = session.TestSession(self)
 
-        teleinfo.UTInfo2 = Mock()
+        cteleinfo.UTInfo2 = Mock()
         self.mocked_parser = MockedParser({})
-        teleinfo.Parser = Mock(return_value=self.mocked_parser)
+        cteleinfo.Parser = Mock(return_value=self.mocked_parser)
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
         with io.open(self.path, 'w') as f:
             f.write(u'')
@@ -537,18 +545,19 @@ class TestTeleinfoHistoEJPTriphase(unittest.TestCase):
             os.remove(self.path)
 
     def init(self):
-        Teleinfo_ = self.session.clone_class(teleinfo.Teleinfo)
+        Teleinfo_ = self.session.clone_class(cteleinfo.Cteleinfo)
         Teleinfo_.USB_PATH = os.path.abspath('./') + '/'
         self.module = self.session.setup(Teleinfo_)
+        self.session.start_module(self.module)
 
     def test_teleinfo_task(self):
         self.init()
         self.mocked_parser.set_get_frame_output(self.TI_HISTO_EJP_TRI)
         self.module._teleinfo_task()
         
-        self.assertEqual(self.session.get_event_calls('teleinfo.power.update'), 1)
-        self.assertEqual(self.session.get_event_calls('teleinfo.consumption.update'), 0)
-        event_params = self.session.get_event_last_params('teleinfo.power.update')
+        self.assertEqual(self.session.event_call_count('teleinfo.power.update'), 1)
+        self.assertEqual(self.session.event_call_count('teleinfo.consumption.update'), 0)
+        event_params = self.session.get_last_event_params('teleinfo.power.update')
         logging.debug('Event params: %s' % event_params)
         self.assertEqual(event_params['power'], (int(self.TI_HISTO_EJP_TRI['IINST1'])+int(self.TI_HISTO_EJP_TRI['IINST2'])+int(self.TI_HISTO_EJP_TRI['IINST3'])) * self.module.VA_FACTOR)
         self.assertEqual(event_params['currentmode'], self.TI_HISTO_EJP_TRI['PTEC'])
@@ -558,6 +567,6 @@ class TestTeleinfoHistoEJPTriphase(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    #coverage run --omit="/usr/local/lib/python2.7/*","test_*" --concurrency=thread test_teleinfo.py; coverage report -m
+    # coverage run --omit="*/lib/python*/*","test_*" --concurrency=thread test_teleinfo.py; coverage report -m -i
     unittest.main()
     
