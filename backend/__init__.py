@@ -1,1 +1,1 @@
-app_filename='cteleinfo'
+APP_FILENAME='cteleinfo'
