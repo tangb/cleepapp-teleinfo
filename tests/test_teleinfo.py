@@ -130,7 +130,7 @@ class TestTeleinfoConfigureHardware(unittest.TestCase):
 class TestTeleinfoConfigureDevices(unittest.TestCase):
 
     def setUp(self):
-        logging.basicConfig(level=logging.DEBUG, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        logging.basicConfig(level=logging.FATAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
         self.session = session.TestSession(self)
 
         self.path = os.path.join(os.getcwd(), 'DUMMY_DONGLE_TINFO_USB')
