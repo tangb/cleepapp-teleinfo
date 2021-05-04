@@ -1,4 +1,4 @@
-<div layout="column" layout-padding ng-cloak>
+<div layout="column" ng-cloak class="module-padding">
 
     <!-- navigation tabs -->
     <md-nav-bar md-selected-nav-item="teleinfoCtl.tabIndex" nav-bar-aria-label="System tabs">
@@ -12,8 +12,11 @@
             <md-subheader class="md-no-sticky">Teleinfo device</md-subheader>
             <md-list-item>
                 <span>Dongle port</span>
-                <div class="md-secondary">
-                    {{teleinfoCtl.port ? teleinfoCtl.port : 'Not found'}}
+                <div class="md-secondary" ng-if="teleinfoCtl.port">
+                    {{teleinfoCtl.port}}
+                </div>
+                <div class="md-secondary" ng-if="!teleinfoCtl.port" style="color: red;">
+                    No dongle found
                 </div>
             </md-list-item>
             <md-subheader class="md-no-sticky">Installation procedure</md-subheader>
