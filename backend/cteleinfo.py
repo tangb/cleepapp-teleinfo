@@ -40,6 +40,7 @@ class Cteleinfo(CleepModule):
     MODULE_URLHELP = 'https://github.com/tangb/cleepmod-teleinfo/wiki'
     MODULE_URLSITE = 'https://www.enedis.fr/'
     MODULE_URLBUGS = 'https://github.com/tangb/cleepmod-teleinfo/issues'
+    MODULE_LABEL = 'Teleinfo'
 
     MODULE_CONFIG_FILE = 'teleinfo.conf'
     DEFAULT_CONFIG = {
