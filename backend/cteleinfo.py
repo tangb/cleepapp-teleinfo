@@ -27,7 +27,7 @@ class Cteleinfo(CleepModule):
         Teleinfo protocol description: https://www.planete-domotique.com/blog/2010/03/30/la-teleinformation-edf/
     """
     MODULE_AUTHOR = 'Cleep'
-    MODULE_VERSION = '1.1.0'
+    MODULE_VERSION = '1.1.1'
     MODULE_DEPS = []
     MODULE_CATEGORY = CATEGORIES.SERVICE
     MODULE_DESCRIPTION = 'Gets house power consumption infos from Enedis electric power meter'
