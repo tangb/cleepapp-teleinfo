@@ -3,6 +3,8 @@ import logging
 import sys
 sys.path.append('../')
 from backend import cteleinfo
+from backend.teleinfoconsumptionupdateevent import TeleinfoConsumptionUpdateEvent
+from backend.teleinfopowerupdateevent import TeleinfoPowerUpdateEvent
 from cleep.exception import InvalidParameter, MissingParameter, CommandError, Unauthorized
 from cleep.libs.tests import session
 import os, io
@@ -564,6 +566,59 @@ class TestTeleinfoHistoEJPTriphase(unittest.TestCase):
         self.assertEqual(event_params['subscription'], self.TI_HISTO_EJP_TRI['ISOUSC'])
         self.assertEqual(event_params['heurescreuses'], int(self.TI_HISTO_EJP_TRI['EJPHN']))
         self.assertEqual(event_params['heurespleines'], int(self.TI_HISTO_EJP_TRI['EJPHPM']))
+
+
+
+
+class TestsTeleinfoConsumptionUpdateEvent(unittest.TestCase):
+
+    def setUp(self):
+        logging.basicConfig(level=logging.FATAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        params = { 
+            'internal_bus': Mock(),
+            'formatters_broker': Mock(),
+            'get_external_bus_name': None,
+        }   
+        self.event = TeleinfoConsumptionUpdateEvent(params)
+
+    def test_event_params(self):
+        self.assertEqual(self.event.EVENT_PARAMS, ['lastupdate', 'heurescreuses', 'heurespleines'])
+
+    def test_event_chart_params(self):
+        self.assertEqual(self.event.EVENT_CHART_PARAMS, ['heurescreuses', 'heurespleines'])
+
+    def test_event_chartable(self):
+        self.assertTrue(self.event.EVENT_CHARTABLE)
+
+    def test_event_propagate(self):
+        self.assertTrue(self.event.EVENT_PROPAGATE)
+
+
+
+
+class TestsTeleinfoPowerUpdateEvent(unittest.TestCase):
+
+    def setUp(self):
+        logging.basicConfig(level=logging.FATAL, format=u'%(asctime)s %(name)s:%(lineno)d %(levelname)s : %(message)s')
+        params = { 
+            'internal_bus': Mock(),
+            'formatters_broker': Mock(),
+            'get_external_bus_name': None,
+        }   
+        self.event = TeleinfoPowerUpdateEvent(params)
+
+    def test_event_params(self):
+        self.assertEqual(self.event.EVENT_PARAMS, ['lastupdate', 'power', 'currentmode', 'nextmode', 'heurescreuses', 'heurespleines', 'subscription'])
+
+    def test_event_chart_params(self):
+        self.assertEqual(self.event.EVENT_CHART_PARAMS, ['power'])
+
+    def test_event_chartable(self):
+        self.assertTrue(self.event.EVENT_CHARTABLE)
+
+    def test_event_propagate(self):
+        self.assertTrue(self.event.EVENT_PROPAGATE)
+
 
 
 if __name__ == "__main__":

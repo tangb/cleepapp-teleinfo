@@ -12,7 +12,6 @@ class TeleinfoPowerUpdateEvent(Event):
     """
 
     EVENT_NAME = 'teleinfo.power.update'
-    EVENT_SYSTEM = False
     EVENT_PARAMS = [
         'lastupdate',
         'power', # puissance instantanée
@@ -24,6 +23,7 @@ class TeleinfoPowerUpdateEvent(Event):
     ]
     EVENT_CHARTABLE = True
     EVENT_CHART_PARAMS = ['power']
+    EVENT_PROPAGATE = True
 
     def __init__(self, params):
         """
