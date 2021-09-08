@@ -1,4 +1,4 @@
-# cleepmod-teleinfo
+# cleepmod-teleinfo [![Coverage Status](https://coveralls.io/repos/github/tangb/cleepapp-teleinfo/badge.svg?branch=master)](https://coveralls.io/github/tangb/cleepapp-teleinfo?branch=master)
 
 Teleinfo module for Cleep
 
